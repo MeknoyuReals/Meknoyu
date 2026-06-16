@@ -167,11 +167,15 @@ local function createGameBtn(name, parent, func)
 end
 
 createGameBtn("Murder Mystery 2 Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReal/Meknoyu/refs/heads/main/MeknoyuMM2.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/mm2.lua"))()
+end)
+
+createGameBtn("Grow a Garden 2 Script", pageGames, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/gag2.lua"))()
 end)
 
 createGameBtn("One Tap Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReal/Meknoyu/refs/heads/main/MeknoyuOneTap.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/onetap.lua"))()
 end)
 
 -- // TAB SERVER CONTENT //
