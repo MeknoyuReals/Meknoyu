@@ -5,7 +5,7 @@ local starterGui = game:GetService("StarterGui")
 local UIS = game:GetService("UserInputService")
 local lighting = game:GetService("Lighting")
 
-local states = {AutoHarvest = false, AutoStealNight = false, AntiAfk = false, AntiLag = false}
+local states = {AutoHarvest = false, AutoStealNight = false, AntiAfk = false, AntiLag = false, AutoSell = false}
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "Meknoyu_GAG2_Gui"
@@ -256,9 +256,31 @@ local runAntiLag = function()
     end)
 end
 
+local runAutoSell = function()
+    _G.AutoSellBuffer = true
+    while states.AutoSell and _G.AutoSellBuffer do
+        pcall(function()
+            local args = {
+                buffer.fromstring("\156\000\019")
+            }
+            game:GetService("ReplicatedStorage")
+                :WaitForChild("SharedModules")
+                :WaitForChild("Packet")
+                :WaitForChild("RemoteEvent")
+                :FireServer(unpack(args))
+        end)
+        task.wait(0.5)
+    end
+end
+
+local stopAutoSell = function()
+    _G.AutoSellBuffer = false
+end
+
 createToggleBtn("Auto Harvest", "AutoHarvest", runHarvest, stopHarvest)
 createToggleBtn("Auto Steal", "AutoStealNight", runSteal, stopSteal)
 createToggleBtn("Anti Afk", "AntiAfk", runAntiAfk)
 createToggleBtn("Anti Lag", "AntiLag", runAntiLag)
+createToggleBtn("Auto Sell", "AutoSell", runAutoSell, stopAutoSell)
 
 starterGui:SetCore("SendNotification", { Title = "Meknoyu GUI", Text = "GAG2 Fully Loaded!", Duration = 5 })
