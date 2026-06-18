@@ -1,4 +1,4 @@
--- [[ MEKNOYU GUI (LOCKED & PROTECTED) - UPDATED WITH FIX FOR TITLE & ANTI FLING ]] --
+-- [[ ULTRA UNDETECTED MEKNOYU GUI (LOCKED & PROTECTED) ]] --
 local plr = game.Players.LocalPlayer
 local rs = game:GetService("RunService")
 local players = game:GetService("Players")
@@ -10,7 +10,17 @@ local guiService = game:GetService("GuiService")
 local cam = workspace.CurrentCamera
 local mouse = plr:GetMouse()
 
--- States
+-- // SCREEN GUI UTAMA //
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Mekno_Clean_Final"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = (gethui and gethui()) or plr:WaitForChild("PlayerGui")
+
+-- ==========================================
+--        MAIN MEKNOYU ENGINE LOAD
+-- ==========================================
+local function mainEngineLoad()
+
 local states = {god=false, noclip=false, esp=false, fling=false, antifling=false, infJump=false, speed=false, fps=false, title=false, antirag=false, antijail=false, bypassac=false, tooltp=false, antitel=false, aimbot=false, aimActive=false, antirobux=false, savepos=false, disco=false, hcxxr=false, addpart=false, xray=false, tpKill=false, antiafk=false, invis=false}
 local originalTransparencies = {}
 local char = plr.Character or plr.CharacterAdded:Wait()
@@ -18,23 +28,99 @@ local hum = char:WaitForChild("Humanoid", 10)
 local hrp = char:WaitForChild("HumanoidRootPart", 10)
 local godConnection, lastPos, savedPos = nil, nil, nil
 local platformPart = nil
+local invisOffset = -100 -- Nilai bawaan offset slider untuk fungsi invisible baru
 
--- Block Deteksi Zona & Objek Anticheat
-workspace.DescendantAdded:Connect(function(v)
-    if states.bypassac and (v.Name:lower():find("anticheat") or v.Name:lower():find("detector") or v.Name:lower():find("cheat")) then
-        pcall(function()
-            if v:IsA("BasePart") then v.CanTouch = false; v.CanQuery = false; v.CanCollide = false
-            elseif v:IsA("Script") or v:IsA("LocalScript") then v.Disabled = true end
-        end)
+-- LOGIKA ANTI DETECT BARU (DENGAN PEMBATALAN JIKA FITUR DIMATIKAN)
+local oldIndex, oldNewIndex
+local connection1, connection2
+
+local function scanAndBypassLocalScripts(root)
+    for _, obj in pairs(root:GetDescendants()) do
+        if obj:IsA("LocalScript") then
+            local name = obj.Name:lower()
+            if name:find("anticheat") or name:find("cheat") or name:find("detector") or name:find("adonis") or name:find("kick") then
+                pcall(function()
+                    obj.Disabled = true
+                    obj:Destroy()
+                end)
+            end
+        end
     end
-end)
+end
+
+local function applyAntiDetect(state)
+    if state then
+        -- 1. PROTEKSI METAMETHOD
+        local gmt = getrawmetatable(game)
+        setreadonly(gmt, false)
+        oldIndex = gmt.__index
+        oldNewIndex = gmt.__newindex
+
+        gmt.__index = newcclosure(function(self, key)
+            if not checkcaller() then
+                if tostring(self) == "Humanoid" and (key == "WalkSpeed" or key == "JumpPower") then
+                    return 16
+                end
+                if tostring(self) == "HumanoidRootPart" and key == "CFrame" then
+                    return oldIndex(self, "CFrame")
+                end
+            end
+            return oldIndex(self, key)
+        end)
+
+        gmt.__newindex = newcclosure(function(self, key, value)
+            if not checkcaller() then
+                if (key == "Disabled" or key == "Parent") and (self:IsA("LocalScript") or self:IsA("ModuleScript")) then
+                    if checkcaller() then 
+                        return oldNewIndex(self, key, value)
+                    else
+                        return nil
+                    end
+                end
+            end
+            return oldNewIndex(self, key, value)
+        end)
+        setreadonly(gmt, true)
+
+        -- 2. SCAN AWAL & REALTIME MONITORING
+        pcall(function()
+            scanAndBypassLocalScripts(plr.PlayerGui)
+            scanAndBypassLocalScripts(plr.StarterGear)
+        end)
+
+        connection1 = workspace.DescendantAdded:Connect(function(v)
+            if (v.Name:lower():find("anticheat") or v.Name:lower():find("detector") or v.Name:lower():find("cheat")) then
+                pcall(function()
+                    if v:IsA("BasePart") then v.CanTouch = false; v.CanQuery = false; v.CanCollide = false
+                    elseif v:IsA("Script") or v:IsA("LocalScript") then v.Disabled = true end
+                end)
+            end
+        end)
+
+        connection2 = plr.PlayerGui.DescendantAdded:Connect(function(descendant)
+            if descendant:IsA("LocalScript") then
+                local name = descendant.Name:lower()
+                if name:find("cheat") or name:find("kick") or name:find("detector") then
+                    descendant.Disabled = true
+                    descendant:Destroy()
+                end
+            end
+        end)
+    else
+        -- KEMBALIKAN METAMETHOD JIKA MATI
+        if oldIndex and oldNewIndex then
+            local gmt = getrawmetatable(game)
+            setreadonly(gmt, false)
+            gmt.__index = oldIndex
+            gmt.__newindex = oldNewIndex
+            setreadonly(gmt, true)
+        end
+        if connection1 then connection1:Disconnect() end
+        if connection2 then connection2:Disconnect() end
+    end
+end
 
 starterGui:SetCore("SendNotification", { Title = "Meknoyu GUI", Text = "System Fully Loaded!", Duration = 5 })
-
--- // SCREEN GUI //
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "Mekno_Clean_Final"; screenGui.ResetOnSpawn = false
-screenGui.Parent = (gethui and gethui()) or plr:WaitForChild("PlayerGui")
 
 --// LANGIT MEKNOYU TEAMS //--
 local discoSky = Instance.new("Sky")
@@ -101,7 +187,7 @@ local tpBackGui = Instance.new("Frame", screenGui); tpBackGui.Size = UDim2.new(0
 local saveBtn = Instance.new("TextButton", tpBackGui); saveBtn.Size = UDim2.new(0, 160 * 0.9, 0, 100 * 0.4); saveBtn.Position = UDim2.new(0.05, 0, 0.05, 0); saveBtn.Text = "Save Pos : OFF"; saveBtn.BackgroundColor3 = Color3.fromRGB(40,40,40); saveBtn.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", saveBtn)
 local clickTpBtn = Instance.new("TextButton", tpBackGui); clickTpBtn.Size = UDim2.new(0, 160 * 0.9, 0, 100 * 0.4); clickTpBtn.Position = UDim2.new(0.05, 0, 0.55, 0); clickTpBtn.Text = "Click TP Back"; clickTpBtn.BackgroundColor3 = Color3.fromRGB(60,20,20); clickTpBtn.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", clickTpBtn)
 saveBtn.MouseButton1Click:Connect(function() states.savepos = not states.savepos; saveBtn.Text = "Save Pos : " .. (states.savepos and "ON" or "OFF"); if states.savepos and hrp then savedPos = hrp.CFrame; lastPos = savedPos end end)
-clickTpBtn.MouseButton1Click:Connect(function() if savedPos and hrp then lastPos = savedPos; wait(0.1); hrp.CFrame = savedPos end end)
+clickTpBtn.MouseButton1Click:Connect(function() if savedPos and hrp then savedPos = savedPos; wait(0.1); hrp.CFrame = savedPos end end)
 
 -- // MAIN GUI STRUCTURE //
 local main = Instance.new("Frame", screenGui)
@@ -251,7 +337,8 @@ local function createToggleBtn(name, key, parent)
     local b = Instance.new("TextButton", parent); b.Text = name .. " : OFF"; b.BackgroundColor3 = Color3.fromRGB(30, 30, 35); b.TextColor3 = Color3.new(1,1,1); b.Font = Enum.Font.GothamSemibold; b.TextSize = 10; Instance.new("UICorner", b)
     b.MouseButton1Click:Connect(function()
         states[key] = not states[key]; b.Text = name .. " : " .. (states[key] and "ON" or "OFF"); b.BackgroundColor3 = states[key] and Color3.fromRGB(50, 50, 70) or Color3.fromRGB(30, 30, 35)
-        if key == "noclip" and not states.noclip then for _, v in pairs(char:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = true end end
+        if key == "bypassac" then applyAntiDetect(states.bypassac)
+        elseif key == "noclip" and not states.noclip then for _, v in pairs(char:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = true end end
         elseif key == "esp" and not states.esp then for _, p in pairs(players:GetPlayers()) do if p.Character and p.Character:FindFirstChild("MeknoHighlight") then p.Character.MeknoHighlight:Destroy() end end
         elseif key == "title" and not states.title then if char and char:FindFirstChild("Head") and char.Head:FindFirstChild("MeknoTitle") then char.Head.MeknoTitle:Destroy() end; if plr.Character and plr.Character:FindFirstChild("Head") and plr.Character.Head:FindFirstChild("MeknoTitle") then plr.Character.Head.MeknoTitle:Destroy() end
         elseif key == "disco" then if states.disco then discoSky.Parent = lighting; skyText.Visible = true else discoSky.Parent = nil; skyText.Visible = false; lighting.Ambient = oldAmbient; lighting.OutdoorAmbient = oldOutdoor; lighting.FogColor = oldFog end
@@ -279,7 +366,7 @@ createToggleBtn("HCXXR Mode", "hcxxr", pageMain)
 createToggleBtn("Add Part", "addpart", pageMain)
 
 -- // TAB SELECT ANTI //
-createToggleBtn("Bypass AntiCheat", "bypassac", pageSelectAnti)
+createToggleBtn("Anti Detect", "bypassac", pageSelectAnti) -- Nama Diganti Anti Detect & Terhubung Ke Logika Ultra Undetected
 createToggleBtn("Anti Fling", "antifling", pageSelectAnti)
 createToggleBtn("Anti Teleport", "antitel", pageSelectAnti)
 createToggleBtn("Anti Ragdoll", "antirag", pageSelectAnti)
@@ -299,7 +386,44 @@ godToggleBtn.MouseButton1Click:Connect(function() states.god = not states.god; g
 
 local invisSubFrame = Instance.new("Frame", screenGui); invisSubFrame.Size = UDim2.new(0, 150, 0, 100); invisSubFrame.Position = UDim2.new(0.5, -75, 0.5, -50); invisSubFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20); invisSubFrame.Visible = false; invisSubFrame.Active = true; invisSubFrame.Draggable = true; Instance.new("UICorner", invisSubFrame)
 local invisToggleBtn = Instance.new("TextButton", invisSubFrame); invisToggleBtn.Size = UDim2.new(0.8, 0, 0.4, 0); invisToggleBtn.Position = UDim2.new(0.1, 0, 0.45, 0); invisToggleBtn.Text = "Invisible : OFF"; invisToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35); invisToggleBtn.TextColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", invisToggleBtn)
-local function setInvisState(state) local c = game.Players.LocalPlayer.Character; if not c then return end for _, o in pairs(workspace:GetChildren()) do if o.Name == 'invischair' then pcall(function() o:Destroy() end) end end for _, v in pairs(c:GetDescendants()) do if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then v.Transparency = 0 end end if state then local r = c:FindFirstChild("HumanoidRootPart"); if not r then return end task.wait(0.05); local scf = r.CFrame; local under = r.Position + Vector3.new(0, -100, 0); c:MoveTo(under); task.wait(0.1); local s = Instance.new("Seat", workspace); s.Anchored = true; s.CanCollide = false; s.Transparency = 1; s.Position = under; s.Name = "invischair"; local w = Instance.new("Weld", s); w.Part0 = s; w.Part1 = r; task.wait(); s.CFrame = scf; s.Anchored = false; for _, v in pairs(c:GetDescendants()) do if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then v.Transparency = 0.5 end end end end
+
+local function setInvisState(state)
+    local c = plr.Character; if not c then return end
+    for _, o in pairs(workspace:GetChildren()) do
+        if o.Name == 'invischair' then pcall(function() o:Destroy() end) end
+    end
+    for _, v in pairs(c:GetDescendants()) do
+        if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
+            v.Transparency = 0
+        end
+    end
+    if state then
+        local r = c:FindFirstChild("HumanoidRootPart"); if not r then return end
+        task.wait(0.05);
+        local scf = r.CFrame;
+        local under = r.Position + Vector3.new(0, invisOffset, 0);
+        c:MoveTo(under);
+        task.wait(0.1)
+        local s = Instance.new("Seat", workspace);
+        s.Anchored = true;
+        s.CanCollide = false;
+        s.Transparency = 1
+        s.Position = under;
+        s.Name = "invischair";
+        local w = Instance.new("Weld", s);
+        w.Part0 = s;
+        w.Part1 = r
+        task.wait();
+        s.CFrame = scf;
+        s.Anchored = false
+        for _, v in pairs(c:GetDescendants()) do
+            if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
+                v.Transparency = 0.5
+            end
+        end
+    end
+end
+
 invisToggleBtn.MouseButton1Click:Connect(function() states.invis = not states.invis; invisToggleBtn.Text = "Invisible : " .. (states.invis and "ON" or "OFF"); invisToggleBtn.BackgroundColor3 = states.invis and Color3.fromRGB(50, 100, 50) or Color3.fromRGB(35, 35, 35); setInvisState(states.invis) end)
 
 local execMainFrame = Instance.new("Frame", screenGui); execMainFrame.Size = UDim2.new(0, 300, 0, 220); execMainFrame.Position = UDim2.new(0.5, -150, 0.5, -110); execMainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20); execMainFrame.Visible = false; execMainFrame.Active = true; execMainFrame.Draggable = true; Instance.new("UICorner", execMainFrame)
@@ -334,24 +458,20 @@ local function miniFling(playerToFling)
 
         humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
 
-        -- Loop teleportasi melekat ke target sampai target terdeteksi kena fling (pental) jauh
         local Time = tick()
         repeat
             if rootPart and targetRootPart then
-                -- Melekatkan posisi kita tepat di rootpart lawan untuk mentransfer gaya physics touch fling
                 rootPart.CFrame = targetRootPart.CFrame * CFrame.new(0, 0, 0)
                 rootPart.Velocity = targetRootPart.Velocity * 10000 + Vector3.new(0, 10000, 0)
                 rootPart.RotVelocity = Vector3.new(0, 10000, 0)
             end
             task.wait()
-        -- Berhenti klu target ter-fling jauh (Velocity tinggi), mati, atau waktu habis (2 detik per player)
         until not targetRootPart or targetRootPart.Parent ~= targetCharacter or targetRootPart.Velocity.Magnitude > 150 or targetHumanoid.Health <= 0 or targetHumanoid.Sit or tick() > Time + 2
 
         BV:Destroy()
         humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
         workspace.CurrentCamera.CameraSubject = humanoid
 
-        -- Mengembalikan posisi ke awal setelah fling selesai
         repeat
             rootPart.CFrame = getgenv().OldPos * CFrame.new(0, .5, 0)
             if character.PrimaryPart then character:SetPrimaryPartCFrame(getgenv().OldPos * CFrame.new(0, .5, 0)) end
@@ -387,16 +507,11 @@ rs.Heartbeat:Connect(function()
         local char = plr.Character
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         local hum = char and char:FindFirstChildOfClass("Humanoid")
-        
         if hrp and hum then
             hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
-            
-            -- Implementasi Metode Baru Touch Fling Sesuai Request (No Spin)
             local currentVel = hrp.Velocity
             hrp.Velocity = currentVel * 10000 + Vector3.new(0, 10000, 0)
-            
             rs.RenderStepped:Wait()
-            
             if hrp then
                 hrp.Velocity = currentVel
                 hrp.RotVelocity = Vector3.new(0, 10000, 0)
@@ -408,9 +523,7 @@ end)
 rs.Stepped:Connect(function()
     if states.fling and plr.Character then
         for _, part in pairs(plr.Character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
-            end
+            if part:IsA("BasePart") then part.CanCollide = false end
         end
     end
 end)
@@ -421,7 +534,6 @@ rs.RenderStepped:Connect(function()
     if states.antirobux then mps.PromptPurchaseFinished:Connect(function() return nil end); mps.PromptProductPurchaseFinished:Connect(function() return nil end) end
     if states.antiafk then pcall(function() guiService:SetMenuIsOpen(false) end) end
     if states.antirag or states.antifling then 
-        -- Anti Fling Fixed: Hanya mematikan state ragdoll agar tidak pingsan saat terkena hantaman physics player lain
         hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
         hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
     end
@@ -437,3 +549,269 @@ rs.RenderStepped:Connect(function()
     if states.noclip then for _, v in pairs(char:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end
     if states.speed and hum.MoveDirection.Magnitude > 0 then hrp.CFrame = hrp.CFrame + (hum.MoveDirection * 1.5) end
 end)
+
+end
+
+-- ==========================================================
+--    LOGIKA BYPASS OWNER & INITIALIZATION KEY SYSTEM
+-- ==========================================================
+if plr.Name == "Meknoyu" then
+    -- OWNER BYPASS KEY SYSTEM
+    mainEngineLoad()
+else
+    -- USER BIASA WAJIB KEY SYSTEM
+    local keyVerified = false
+    local currentGeneratedKey = ""
+
+    local keyGui = Instance.new("Frame")
+    keyGui.Name = "KeyGui"
+    keyGui.Size = UDim2.new(0, 360, 0, 385)
+    keyGui.Position = UDim2.new(0.5, -180, 0.5, -192)
+    keyGui.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    keyGui.BorderSizePixel = 0
+    keyGui.Active = true
+    Instance.new("UICorner", keyGui)
+    local keyStroke = Instance.new("UIStroke", keyGui)
+    keyStroke.Thickness = 2
+    keyStroke.Color = Color3.fromRGB(255, 255, 255)
+    keyGui.Parent = screenGui
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, 0, 0, 40)
+    titleLabel.Position = UDim2.new(0, 0, 0, 10)
+    titleLabel.Text = "Meknoyu GUI"
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 22
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Parent = keyGui
+
+    local subTitleLabel = Instance.new("TextLabel")
+    subTitleLabel.Size = UDim2.new(1, 0, 0, 25)
+    subTitleLabel.Position = UDim2.new(0, 0, 0, 45)
+    subTitleLabel.Text = "Get Key\n(Expired in 23h 59m)"
+    subTitleLabel.Font = Enum.Font.GothamMedium
+    subTitleLabel.TextSize = 12
+    subTitleLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+    subTitleLabel.BackgroundTransparency = 1
+    subTitleLabel.Parent = keyGui
+
+    local keyTextBox = Instance.new("TextBox")
+    keyTextBox.Size = UDim2.new(0.85, 0, 0, 35)
+    keyTextBox.Position = UDim2.new(0.075, 0, 0, 90)
+    keyTextBox.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    keyTextBox.Text = ""
+    keyTextBox.PlaceholderText = "Example_Key"
+    keyTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    keyTextBox.Font = Enum.Font.Gotham
+    keyTextBox.TextSize = 14
+    Instance.new("UICorner", keyTextBox)
+    keyTextBox.Parent = keyGui
+
+    local getKeyBtn = Instance.new("TextButton")
+    getKeyBtn.Size = UDim2.new(0.4, 0, 0, 35)
+    getKeyBtn.Position = UDim2.new(0.075, 0, 0, 140)
+    getKeyBtn.Text = "Get Key"
+    getKeyBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    getKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    getKeyBtn.Font = Enum.Font.GothamBold
+    getKeyBtn.TextSize = 14
+    Instance.new("UICorner", getKeyBtn)
+    getKeyBtn.Parent = keyGui
+
+    local confirmBtn = Instance.new("TextButton")
+    confirmBtn.Size = UDim2.new(0.4, 0, 0, 35)
+    confirmBtn.Position = UDim2.new(0.525, 0, 0, 140)
+    confirmBtn.Text = "Confirm"
+    confirmBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    confirmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    confirmBtn.Font = Enum.Font.GothamBold
+    confirmBtn.TextSize = 14
+    Instance.new("UICorner", confirmBtn)
+    confirmBtn.Parent = keyGui
+
+    -- ==========================================
+    --        QUEST SYSTEM MENU & COOLDOWN
+    -- ==========================================
+    local questFrame = Instance.new("Frame")
+    questFrame.Size = UDim2.new(0, 340, 0, 190)
+    questFrame.Position = UDim2.new(0.025, 0, 0, 185)
+    questFrame.BackgroundTransparency = 1
+    questFrame.Visible = false
+    questFrame.Parent = keyGui
+
+    local quests = {
+        {text = "LIKE SCRIPT THIS FOR FREE!", cd = 10},
+        {text = "MEKNOYU OFFICIAL SCRIPT OP!", cd = 20},
+        {text = "GET KEY FOR FREE YOUR!", cd = 30},
+        {text = "SCRIPT UPDATE NEW FEATURES!", cd = 50}
+    }
+
+    local questButtons = {}
+    local questStatus = {false, false, false, false}
+
+    for i, q in ipairs(quests) do
+        local qBtn = Instance.new("TextButton")
+        qBtn.Size = UDim2.new(0.65, 0, 0, 35)
+        qBtn.Position = UDim2.new(0, 0, 0, (i-1) * 45)
+        qBtn.Text = q.text
+        qBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+        qBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        qBtn.Font = Enum.Font.GothamSemibold
+        qBtn.TextSize = 10
+        qBtn.TextWrapped = true
+        Instance.new("UICorner", qBtn)
+        qBtn.Parent = questFrame
+        
+        local cdLabel = Instance.new("TextLabel")
+        cdLabel.Size = UDim2.new(0.3, 0, 0, 35)
+        cdLabel.Position = UDim2.new(0.7, 0, 0, (i-1) * 45)
+        cdLabel.Text = q.cd .. " s"
+        cdLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        cdLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        cdLabel.Font = Enum.Font.GothamBold
+        cdLabel.TextSize = 12
+        Instance.new("UICorner", cdLabel)
+        cdLabel.Parent = questFrame
+
+        qBtn.MouseButton1Click:Connect(function()
+            if questStatus[i] == false then
+                questStatus[i] = "processing"
+                qBtn.Active = false
+                task.spawn(function()
+                    local currentCd = q.cd
+                    while currentCd > 0 do
+                        cdLabel.Text = currentCd .. "s"
+                        qBtn.BackgroundColor3 = Color3.fromRGB(80, 50, 50)
+                        task.wait(1)
+                        currentCd = currentCd - 1
+                    end
+                    cdLabel.Text = "DONE"
+                    qBtn.BackgroundColor3 = Color3.fromRGB(50, 100, 50)
+                    questStatus[i] = true
+                    
+                    local allDone = true
+                    for _, status in ipairs(questStatus) do
+                        if status ~= true then allDone = false break end
+                    end
+                    
+                    if allDone then
+                        task.wait(0.5)
+                        questFrame.Visible = false
+                        showCopyKeyGui()
+                    end
+                end)
+            end
+        end)
+    end
+
+    -- ==========================================
+    --        GUI COPY YOUR KEY PAGE
+    -- ==========================================
+    local copyKeyGui = Instance.new("Frame")
+    copyKeyGui.Name = "CopyKeyGui"
+    copyKeyGui.Size = UDim2.new(1, 0, 1, 0)
+    copyKeyGui.BackgroundTransparency = 1
+    copyKeyGui.Visible = false
+    copyKeyGui.Parent = keyGui
+
+    local copyTitle = Instance.new("TextLabel")
+    copyTitle.Size = UDim2.new(1, 0, 0, 40)
+    copyTitle.Position = UDim2.new(0, 0, 0, 40)
+    copyTitle.Text = "Copy Your Key"
+    copyTitle.Font = Enum.Font.GothamBold
+    copyTitle.TextSize = 20
+    copyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    copyTitle.BackgroundTransparency = 1
+    copyTitle.Parent = copyKeyGui
+
+    local keyDisplayBox = Instance.new("TextBox")
+    keyDisplayBox.Size = UDim2.new(0.85, 0, 0, 35)
+    keyDisplayBox.Position = UDim2.new(0.075, 0, 0, 100)
+    keyDisplayBox.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    keyDisplayBox.Text = ""
+    keyDisplayBox.TextColor3 = Color3.fromRGB(0, 255, 0)
+    keyDisplayBox.Font = Enum.Font.Code
+    keyDisplayBox.TextSize = 12
+    keyDisplayBox.ClearTextOnFocus = false
+    keyDisplayBox.TextEditable = false
+    Instance.new("UICorner", keyDisplayBox)
+    keyDisplayBox.Parent = copyKeyGui
+
+    local copyActionBtn = Instance.new("TextButton")
+    copyActionBtn.Size = UDim2.new(0.5, 0, 0, 35)
+    copyActionBtn.Position = UDim2.new(0.25, 0, 0, 160)
+    copyActionBtn.Text = "Click to Copy Key"
+    copyActionBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    copyActionBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    copyActionBtn.Font = Enum.Font.GothamBold
+    copyActionBtn.TextSize = 13
+    Instance.new("UICorner", copyActionBtn)
+    copyActionBtn.Parent = copyKeyGui
+
+    copyActionBtn.MouseButton1Click:Connect(function()
+        if setclipboard then
+            setclipboard(currentGeneratedKey)
+            copyActionBtn.Text = "Copied Success!"
+            task.wait(1)
+            copyActionBtn.Text = "Click to Copy Key"
+        end
+    end)
+
+    local closeCopyBtn = Instance.new("TextButton")
+    closeCopyBtn.Size = UDim2.new(0, 30, 0, 30)
+    closeCopyBtn.Position = UDim2.new(1, -35, 0, 5)
+    closeCopyBtn.Text = "X"
+    closeCopyBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
+    closeCopyBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    closeCopyBtn.Font = Enum.Font.GothamBold
+    closeCopyBtn.TextSize = 14
+    Instance.new("UICorner", closeCopyBtn)
+    closeCopyBtn.Parent = copyKeyGui
+
+    closeCopyBtn.MouseButton1Click:Connect(function()
+        copyKeyGui.Visible = false
+        titleLabel.Visible = true
+        subTitleLabel.Visible = true
+        keyTextBox.Visible = true
+        getKeyBtn.Visible = true
+        confirmBtn.Visible = true
+    end)
+
+    function showCopyKeyGui()
+        titleLabel.Visible = false
+        subTitleLabel.Visible = false
+        keyTextBox.Visible = false
+        getKeyBtn.Visible = false
+        confirmBtn.Visible = false
+        
+        local chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        local randomString = ""
+        for i = 1, 8 do
+            local rand = math.random(1, #chars)
+            randomString = randomString .. string.sub(chars, rand, rand)
+        end
+        currentGeneratedKey = "Mekno_" .. randomString
+        keyDisplayBox.Text = currentGeneratedKey
+        
+        copyKeyGui.Visible = true
+    end
+
+    getKeyBtn.MouseButton1Click:Connect(function()
+        questFrame.Visible = true
+    end)
+
+    confirmBtn.MouseButton1Click:Connect(function()
+        if keyTextBox.Text == currentGeneratedKey and currentGeneratedKey ~= "" then
+            keyVerified = true
+            keyGui:Destroy() 
+            mainEngineLoad()     
+        else
+            confirmBtn.Text = "INVALID KEY!"
+            confirmBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+            task.wait(1.5)
+            confirmBtn.Text = "Confirm"
+            confirmBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        end
+    end)
+end
