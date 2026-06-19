@@ -346,6 +346,7 @@ local function createToggleBtn(name, key, parent)
         elseif key == "addpart" and not states.addpart then if platformPart then platformPart:Destroy(); platformPart = nil end
         elseif key == "antirobux" and not states.antirobux then pcall(function() guiService.MenuOpened:Disconnect() end)
         elseif key == "xray" and not states.xray then for obj, trans in pairs(originalTransparencies) do if obj and obj.Parent then obj.Transparency = trans end end; originalTransparencies = {}
+        elseif key == "antitel" and states.antitel then if hrp then lastPos = hrp.CFrame end -- Ambil posisi saat ini begitu Anti Teleport dinyalakan
         end
     end)
     return b
@@ -366,7 +367,7 @@ createToggleBtn("HCXXR Mode", "hcxxr", pageMain)
 createToggleBtn("Add Part", "addpart", pageMain)
 
 -- // TAB SELECT ANTI //
-createToggleBtn("Anti Detect", "bypassac", pageSelectAnti) -- Nama Diganti Anti Detect & Terhubung Ke Logika Ultra Undetected
+createToggleBtn("Anti Detect", "bypassac", pageSelectAnti)
 createToggleBtn("Anti Fling", "antifling", pageSelectAnti)
 createToggleBtn("Anti Teleport", "antitel", pageSelectAnti)
 createToggleBtn("Anti Ragdoll", "antirag", pageSelectAnti)
@@ -537,7 +538,21 @@ rs.RenderStepped:Connect(function()
         hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
         hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
     end
-    if states.antitel and lastPos then local distance = (hrp.Position - lastPos.Position).Magnitude; if distance > 40 and not (states.speed or states.tooltp or states.savepos or states.tpKill or states.antifling) then hrp.Velocity = Vector3.new(0,0,0); hrp.CFrame = lastPos else lastPos = hrp.CFrame end else lastPos = hrp.CFrame end
+    
+    -- [[ FIXED ANTI TELEPORT LOGIC ]] --
+    if states.antitel and lastPos then 
+        local distance = (hrp.Position - lastPos.Position).Magnitude
+        -- Menjaga posisi jika ada perpindahan paksa dari server (melebihi jarak 40 studs)
+        if distance > 40 and not (states.speed or states.tooltp or states.savepos or states.tpKill or states.antifling or states.fling) then 
+            hrp.Velocity = Vector3.new(0,0,0)
+            hrp.CFrame = lastPos 
+        else 
+            lastPos = hrp.CFrame 
+        end 
+    else 
+        lastPos = hrp.CFrame 
+    end
+    
     if states.addpart then if not platformPart or not platformPart.Parent then platformPart = Instance.new("Part"); platformPart.Name = "MeknoPlatform"; platformPart.Size = Vector3.new(7, 1, 7); platformPart.Anchored = true; platformPart.Material = Enum.Material.Neon; platformPart.Color = Color3.fromRGB(150, 0, 0); platformPart.Parent = workspace end; platformPart.CFrame = CFrame.new(hrp.Position.X, hrp.Position.Y - 3.5, hrp.Position.Z) end
     if states.xray then for _, obj in pairs(workspace:GetDescendants()) do if obj:IsA("BasePart") and not obj:IsDescendantOf(char) and not players:GetPlayerFromCharacter(obj.Parent) then if not originalTransparencies[obj] then originalTransparencies[obj] = obj.Transparency end; obj.Transparency = 0.65 end end end
     if states.tpKill then local targetEnemy = nil; local shortestDist = math.huge; for _, p in pairs(players:GetPlayers()) do if p ~= plr and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0 then local tChar = p.Character; local inLobby = tChar.Parent.Name:lower():find("lobby") or tChar:FindFirstChild("InLobby") or (tChar.HumanoidRootPart.Position.Y > 200 and workspace:FindFirstChild("Lobby")); if not inLobby and (not plr.Team or p.Team ~= plr.Team) then local targetHrp = p.Character.HumanoidRootPart; local currentDist = (targetHrp.Position - hrp.Position).Magnitude; if currentDist < shortestDist then targetEnemy = targetHrp; shortestDist = currentDist end end end end; if targetEnemy then hrp.CFrame = targetEnemy.CFrame * CFrame.new(0, 0, 3); hrp.Velocity = Vector3.new(0, 0, 0); cam.CFrame = CFrame.new(cam.CFrame.Position, targetEnemy.Position) end end
