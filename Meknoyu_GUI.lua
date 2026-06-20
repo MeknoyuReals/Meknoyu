@@ -581,6 +581,40 @@ else
     -- USER BIASA WAJIB KEY SYSTEM
     local keyVerified = false
     local currentGeneratedKey = ""
+    local fileName = "Meknoyu_KeySystem.txt"
+    local httpService = game:GetService("HttpService")
+
+    -- FUNGSI MEMBACA DATA KEY YANG TERSIMPAN DI FILE PERANGKAT
+    local function getSavedKeyData()
+        if readfile and isfile and isfile(fileName) then
+            local success, result = pcall(function()
+                return httpService:JSONDecode(readfile(fileName))
+            end)
+            if success and result and result.Key and result.ExpireTime then
+                return result
+            end
+        end
+        return nil
+    end
+
+    -- FUNGSI MENYIMPAN DATA KEY BARU KE PERANGKAT
+    local function saveKeyData(key, hours)
+        if writefile then
+            local data = {
+                Key = key,
+                ExpireTime = os.time() + (hours * 3600)
+            }
+            writefile(fileName, httpService:JSONEncode(data))
+        end
+    end
+
+    -- CEK RE-LOG AUTOMATIC VERIFICATION
+    local savedData = getSavedKeyData()
+    if savedData and savedData.ExpireTime > os.time() then
+        -- Jika key tersimpan dan waktu kadaluwarsa belum habis, langsung buka engine utama
+        mainEngineLoad()
+        return
+    end
 
     local keyGui = Instance.new("Frame")
     keyGui.Name = "KeyGui"
@@ -804,15 +838,21 @@ else
         getKeyBtn.Visible = false
         confirmBtn.Visible = false
         
-        local chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        local randomString = ""
-        for i = 1, 8 do
-            local rand = math.random(1, #chars)
-            randomString = randomString .. string.sub(chars, rand, rand)
+        -- Gunakan key tersimpan lama (jika ada file mentah tapi habis waktu) atau buat string random baru
+        local baseData = getSavedKeyData()
+        if baseData then
+            currentGeneratedKey = baseData.Key
+        else
+            local chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            local randomString = ""
+            for i = 1, 8 do
+                local rand = math.random(1, #chars)
+                randomString = randomString .. string.sub(chars, rand, rand)
+            end
+            currentGeneratedKey = "Mekno_" .. randomString
         end
-        currentGeneratedKey = "Mekno_" .. randomString
-        keyDisplayBox.Text = currentGeneratedKey
         
+        keyDisplayBox.Text = currentGeneratedKey
         copyKeyGui.Visible = true
     end
 
@@ -823,6 +863,8 @@ else
     confirmBtn.MouseButton1Click:Connect(function()
         if keyTextBox.Text == currentGeneratedKey and currentGeneratedKey ~= "" then
             keyVerified = true
+            -- Menyimpan data key dan set timer aktif ke file executor perangkat selama 23.98 jam
+            saveKeyData(currentGeneratedKey, 23.98)
             keyGui:Destroy() 
             mainEngineLoad()     
         else
