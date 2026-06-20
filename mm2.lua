@@ -2,7 +2,7 @@
 -- UPDATED: RESTORED INVISIBLE & ANTI-FLING LOGIC
 
 if game.PlaceId ~= 142823291 and game.PlaceId ~= 335132305 then 
-    game.Players.LocalPlayer:Kick("Kamu tidak di game") 
+    game.Players.LocalPlayer:Kick("You Not in game") 
     return 
 end 
 
