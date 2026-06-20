@@ -256,6 +256,10 @@ createGameBtn("Murder Mystery 2 Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/mm2.lua"))()
 end)
 
+createGameBtn("Studio Lite Script", pageGames, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Studiolite.lua"))()
+end)
+
 createGameBtn("Grow a Garden 2 Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/gag2.lua"))()
 end)
