@@ -100,49 +100,27 @@ local grid = Instance.new("UIGridLayout", container)
 grid.CellSize = UDim2.new(1, 0, 0, 45)
 grid.CellPadding = UDim2.new(0, 0, 0, 8)
 
--- Fungsi Pembuat Tombol Dengan Sleek Switch Toggle Sesuai Request
+-- Fungsi Pembuat Tombol Dengan Standard Text On/Off Toggle (Fixed)
 local function makeToggle(text, flagKey, callback)
     local btn = Instance.new("TextButton", container)
-    btn.Text = ""
+    btn.Text = text .. " : OFF"
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextSize = 13
+    btn.TextColor3 = Color3.fromRGB(230, 230, 230)
     btn.BackgroundColor3 = Color3.fromRGB(45, 45, 20)
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-    
-    local txt = Instance.new("TextLabel", btn)
-    txt.Size = UDim2.new(1, -60, 1, 0)
-    txt.Position = UDim2.new(0, 12, 0, 0)
-    txt.Text = text
-    txt.Font = Enum.Font.GothamSemibold
-    txt.TextSize = 13
-    txt.TextColor3 = Color3.fromRGB(230, 230, 230)
-    txt.TextXAlignment = Enum.TextXAlignment.Left
-    txt.BackgroundTransparency = 1
-
-    -- Sleek Switch Frame (Kapsul Base)
-    local switchBase = Instance.new("Frame", btn)
-    switchBase.Size = UDim2.new(0, 42, 0, 22)
-    switchBase.Position = UDim2.new(1, -52, 0.5, -11)
-    switchBase.BackgroundColor3 = Color3.fromRGB(70, 70, 60)
-    Instance.new("UICorner", switchBase).CornerRadius = UDim.new(1, 0)
-    
-    -- Sleek Switch Circle (Tombol Bulat Geser)
-    local switchCircle = Instance.new("Frame", switchBase)
-    switchCircle.Size = UDim2.new(0, 18, 0, 18)
-    switchCircle.Position = UDim2.new(0, 2, 0.5, -9)
-    switchCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    Instance.new("UICorner", switchCircle).CornerRadius = UDim.new(1, 0)
 
     btn.MouseButton1Click:Connect(function()
         flags[flagKey] = not flags[flagKey]
         
-        -- Animasi Transisi Visual Sleek Switch
         if flags[flagKey] then
-            switchBase:TweenBackgroundColor3(Color3.fromRGB(0, 210, 100), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.25, true)
-            switchCircle:TweenPosition(UDim2.new(1, -20, 0.5, -9), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.25, true)
-            txt.TextColor3 = Color3.fromRGB(255, 255, 255)
+            btn.Text = text .. " : ON"
+            btn.BackgroundColor3 = Color3.fromRGB(35, 90, 35) -- Warna Hijau saat aktif
+            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
         else
-            switchBase:TweenBackgroundColor3(Color3.fromRGB(70, 70, 60), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.25, true)
-            switchCircle:TweenPosition(UDim2.new(0, 2, 0.5, -9), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.25, true)
-            txt.TextColor3 = Color3.fromRGB(230, 230, 230)
+            btn.Text = text .. " : OFF"
+            btn.BackgroundColor3 = Color3.fromRGB(45, 45, 20) -- Kembali ke warna awal
+            btn.TextColor3 = Color3.fromRGB(230, 230, 230)
         end
         
         callback(flags[flagKey])
