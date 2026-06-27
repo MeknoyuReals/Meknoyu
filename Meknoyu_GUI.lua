@@ -355,6 +355,20 @@ local function createToggleBtn(name, key, parent)
         elseif key == "antirobux" and not states.antirobux then pcall(function() guiService.MenuOpened:Disconnect() end)
         elseif key == "xray" and not states.xray then for obj, trans in pairs(originalTransparencies) do if obj and obj.Parent then obj.Transparency = trans end end; originalTransparencies = {}
         elseif key == "antitel" and states.antitel then if hrp then lastPos = hrp.CFrame end -- Ambil posisi saat ini begitu Anti Teleport dinyalakan
+        elseif key == "antifling" and not states.antifling then
+            -- INSTANTLY RESTORE COLLISION WHEN ANTI-FLING IS TURNED OFF
+            if plr.Character then
+                for _, part in pairs(plr.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then part.CanCollide = true end
+                end
+            end
+            for _, p in pairs(players:GetPlayers()) do
+                if p ~= plr and p.Character then
+                    for _, part in pairs(p.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then part.CanCollide = true end
+                    end
+                end
+            end
         end
     end)
     return b
@@ -472,7 +486,7 @@ local function miniFling(playerToFling)
             if rootPart and targetRootPart then
                 rootPart.CFrame = targetRootPart.CFrame * CFrame.new(0, 0, 0)
                 rootPart.Velocity = targetRootPart.Velocity * 10000 + Vector3.new(0, 10000, 0)
-                rootPart.RotVelocity = Vector3.new(0, 10000, 0)
+                rootPart.RotVelocity = Vector3.new(0, 0, 0) -- REMOVED SPIN ON INDIVIDUAL FLING TOO
             end
             task.wait()
         until not targetRootPart or targetRootPart.Parent ~= targetCharacter or targetRootPart.Velocity.Magnitude > 150 or targetHumanoid.Health <= 0 or targetHumanoid.Sit or tick() > Time + 2
@@ -523,7 +537,7 @@ rs.Heartbeat:Connect(function()
             rs.RenderStepped:Wait()
             if hrp then
                 hrp.Velocity = currentVel
-                hrp.RotVelocity = Vector3.new(0, 10000, 0)
+                hrp.RotVelocity = Vector3.new(0, 0, 0) -- FIXED: REMOVED SPIN/ROTATION
             end
         end
     end
@@ -542,9 +556,35 @@ rs.RenderStepped:Connect(function()
     if states.god then if hum.Health < 100000000 or hum.MaxHealth < 100000000 then hum.MaxHealth = 100000000; hum.Health = 100000000 end end
     if states.antirobux then mps.PromptPurchaseFinished:Connect(function() return nil end); mps.PromptProductPurchaseFinished:Connect(function() return nil end) end
     if states.antiafk then pcall(function() guiService:SetMenuIsOpen(false) end) end
-    if states.antirag or states.antifling then 
+    
+    -- [[ FIXED ANTI FLING & NO COLLISION ALL PLAYERS ]] --
+    if states.antifling or states.antirag then 
         hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
         hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+        
+        if states.antifling then
+            -- Set collision karakter sendiri ke false
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+            -- Set semua karakter player lain agar tidak bertabrakan dengan kita
+            for _, p in pairs(players:GetPlayers()) do
+                if p ~= plr and p.Character then
+                    for _, part in pairs(p.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                            -- Menghilangkan velocity ekstrem dari player lain yang mencoba mem-fling
+                            if part.Velocity.Magnitude > 100 or part.RotVelocity.Magnitude > 100 then
+                                part.Velocity = Vector3.new(0,0,0)
+                                part.RotVelocity = Vector3.new(0,0,0)
+                            end
+                        end
+                    end
+                end
+            end
+        end
     end
     
     -- [[ FIXED ANTI TELEPORT LOGIC ]] --
