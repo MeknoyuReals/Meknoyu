@@ -625,6 +625,49 @@ else
     -- USER BIASA WAJIB KEY SYSTEM
     local keyVerified = false
     local currentGeneratedKey = ""
+    local fileName = "Meknoyu_KeyData.json"
+    local HttpService = game:GetService("HttpService")
+
+    -- FUNGSI SIMPAN KEY KE PERANGKAT
+    local function saveKeyToDevice(key, durationInSeconds)
+        local data = {
+            SavedKey = key,
+            ExpireTime = os.time() + durationInSeconds
+        }
+        pcall(function()
+            if writefile then
+                writefile(fileName, HttpService:JSONEncode(data))
+            end
+        end)
+    end
+
+    -- FUNGSI CEK KEY YANG TERSIMPAN
+    local function checkSavedKey()
+        if not readfile or not isfile then return false end
+        if isfile(fileName) then
+            local success, content = pcall(readfile, fileName)
+            if success then
+                local success2, data = pcall(function() return HttpService:JSONDecode(content) end)
+                if success2 and data and data.SavedKey and data.ExpireTime then
+                    -- Cek apakah waktu saat ini masih kurang dari waktu kedaluwarsa
+                    if os.time() < data.ExpireTime then
+                        currentGeneratedKey = data.SavedKey
+                        return true
+                    else
+                        -- Jika sudah kedaluwarsa, hapus filenya
+                        pcall(delfile, fileName)
+                    end
+                end
+            end
+        end
+        return false
+    end
+
+    -- Cek otomatis saat pasang script, kalau key masih valid langsung load engine tanpa muncul GUI key
+    if checkSavedKey() then
+        mainEngineLoad()
+        return 
+    end
 
     local keyGui = Instance.new("Frame")
     keyGui.Name = "KeyGui"
@@ -867,6 +910,8 @@ else
     confirmBtn.MouseButton1Click:Connect(function()
         if keyTextBox.Text == currentGeneratedKey and currentGeneratedKey ~= "" then
             keyVerified = true
+            -- SIMPAN KEY KE WORKSPACE EXECUTOR (Durasi: 86340 detik = 23 jam 59 menit)
+            saveKeyToDevice(currentGeneratedKey, 86340)
             keyGui:Destroy() 
             mainEngineLoad()     
         else
