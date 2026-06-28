@@ -571,13 +571,8 @@ rs.RenderStepped:Connect(function()
         hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
         
         if states.antifling then
-            -- Set collision karakter sendiri ke false
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
-            end
-            -- Set semua karakter player lain agar tidak bertabrakan dengan kita
+            -- MENGUBAH LOGIKA: Karakter sendiri tetap CanCollide = true agar tidak noclip ke objek/map.
+            -- Hanya mengatur part dari semua player lain agar dinonaktifkan collision-nya terhadap kita secara lokal.
             for _, p in pairs(players:GetPlayers()) do
                 if p ~= plr and p.Character then
                     for _, part in pairs(p.Character:GetDescendants()) do
