@@ -18,7 +18,6 @@ screenGui.Parent = (gethui and gethui()) or localPlayer:WaitForChild("PlayerGui"
 local states = {
     aimbotGuard = false,
     aimbotCrim = false,
-    aimbotAngry = false,
     espActive = false,
     autoTakeGun = false
 }
@@ -114,22 +113,7 @@ end)
 -- ==========================================
 --        LOGIKA AIMBOT WITH DISTANCE CHECK
 -- ==========================================
--- Fungsi pembantu untuk mendeteksi tanda marah (💢) pada karakter pemain
-local function isAngry(player)
-    if player.Character then
-        -- Mencari logo 💢 di dalam nama BillboardGui atau objek teks kustom karakter
-        for _, descendant in pairs(player.Character:GetDescendants()) do
-            if descendant:IsA("TextLabel") or descendant:IsA("TextBox") then
-                if string.find(descendant.Text, "💢") then
-                    return true
-                end
-            end
-        end
-    end
-    return false
-end
-
-local function getClosestPlayerByTeam(teamName, checkAngry)
+local function getClosestPlayerByTeam(teamName)
     local closestPlayer = nil
     local shortestDistance = math.huge
 
@@ -140,14 +124,7 @@ local function getClosestPlayerByTeam(teamName, checkAngry)
     local myPos = localPlayer.Character.HumanoidRootPart.Position
 
     for _, v in pairs(Players:GetPlayers()) do
-        local isValidTeam = false
-        if teamName == "AngryInmates" then
-            isValidTeam = (v.Team and v.Team.Name == "Inmates" and isAngry(v))
-        else
-            isValidTeam = (v.Team and (v.Team.Name == teamName or (teamName == "Guards" and v.Team.Name == "Police")))
-        end
-
-        if v ~= localPlayer and isValidTeam then
+        if v ~= localPlayer and v.Team and (v.Team.Name == teamName or (teamName == "Guards" and v.Team.Name == "Police")) then
             if v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
                 
                 local worldDistance = (v.Character.HumanoidRootPart.Position - myPos).Magnitude
@@ -175,8 +152,6 @@ RunService.RenderStepped:Connect(function()
         target = getClosestPlayerByTeam("Guards")
     elseif states.aimbotCrim then
         target = getClosestPlayerByTeam("Criminals")
-    elseif states.aimbotAngry then
-        target = getClosestPlayerByTeam("AngryInmates")
     end
 
     if target and target.Character and target.Character:FindFirstChild("Head") then
@@ -191,11 +166,11 @@ local function getTeamColor(player)
     if player.Team then
         local name = player.Team.Name
         if name == "Criminals" then
-            return Color3.fromRGB(255, 0, 0) -- Merah
+            return Color3.fromRGB(255, 0, 0)
         elseif name == "Inmates" then
-            return Color3.fromRGB(255, 165, 0) -- Oren
+            return Color3.fromRGB(255, 165, 0)
         elseif name == "Guards" or name == "Police" then
-            return Color3.fromRGB(0, 0, 255) -- Biru
+            return Color3.fromRGB(0, 0, 255)
         end
     end
     return Color3.fromRGB(255, 255, 255)
@@ -296,24 +271,20 @@ local function createToggle(name, stateKey)
     btn.MouseButton1Click:Connect(function()
         states[stateKey] = not states[stateKey]
         
-        -- Reset status tombol aimbot lain jika tombol ini diaktifkan
         if states[stateKey] then
             if stateKey == "aimbotGuard" then
                 states.aimbotCrim = false
-                states.aimbotAngry = false
+                local targetBtn = container:FindFirstChild("Aimbot Crims")
+                if targetBtn then
+                    targetBtn.Text = "Aimbot Crims : OFF"
+                    targetBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+                end
             elseif stateKey == "aimbotCrim" then
                 states.aimbotGuard = false
-                states.aimbotAngry = false
-            elseif stateKey == "aimbotAngry" then
-                states.aimbotGuard = false
-                states.aimbotCrim = false
-            end
-            
-            -- Sinkronisasi visual tombol lainnya
-            for _, child in pairs(container:GetChildren()) do
-                if child:IsA("TextButton") and child.Name ~= name and string.find(child.Name, "Aimbot") then
-                    child.Text = child.Name .. " : OFF"
-                    child.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+                local targetBtn = container:FindFirstChild("Aimbot Guard")
+                if targetBtn then
+                    targetBtn.Text = "Aimbot Guard : OFF"
+                    targetBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
                 end
             end
         end
@@ -347,7 +318,12 @@ end
 -- ==========================================
 createToggle("Aimbot Guard", "aimbotGuard")
 createToggle("Aimbot Crims", "aimbotCrim")
-createToggle("Aimbot Inmates Angry 💢", "aimbotAngry")
+
+createButton("Reset", function()
+    if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
+        localPlayer.Character.Humanoid.Health = 0
+    end
+end)
 
 createToggle("ESP", "espActive")
 
