@@ -256,6 +256,10 @@ createGameBtn("Murder Mystery 2 Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/mm2.lua"))()
 end)
 
+createGameBtn("Troll Pinning Tower 2 Script", pageGames, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Trollpinningtower2.lua"))()
+end)
+
 createGameBtn("Sell Lemons Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Sell_lemons.lua"))()
 end)
