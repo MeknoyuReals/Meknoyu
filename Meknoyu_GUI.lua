@@ -1,4 +1,4 @@
--- [[ ULTRA UNDETECTED MEKNOYU GUI (LOCKED & PROTECTED) ]] --
+-- [[ ULTRA MEKNOYU GUI (LOCKED & PROTECTED) ]] --
 local plr = game.Players.LocalPlayer
 local rs = game:GetService("RunService")
 local players = game:GetService("Players")
@@ -7,6 +7,7 @@ local UIS = game:GetService("UserInputService")
 local mps = game:GetService("MarketplaceService")
 local lighting = game:GetService("Lighting")
 local guiService = game:GetService("GuiService")
+local TweenService = game:GetService("TweenService")
 local cam = workspace.CurrentCamera
 local mouse = plr:GetMouse()
 
@@ -197,28 +198,129 @@ main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 main.Active = true; main.Draggable = true; Instance.new("UICorner", main)
 local stroke = Instance.new("UIStroke", main)
 stroke.Thickness = 2.5
-rs.RenderStepped:Connect(function() stroke.Color = Color3.fromHSV((tick() * 0.2) % 1, 0.8, 1) end)
+
+local miniBtn = Instance.new("TextButton", screenGui); miniBtn.Size = UDim2.new(0, 50, 0, 50); miniBtn.Position = UDim2.new(0.9, 0, 0.05, 0); miniBtn.Text = "MEKNO"; miniBtn.BackgroundColor3 = Color3.fromRGB(20,20,20); miniBtn.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", miniBtn).CornerRadius = UDim.new(1,0); miniBtn.Draggable = true; miniBtn.Visible = false
+
+local isRainbow = true
+local rainbowConnection
+rainbowConnection = rs.RenderStepped:Connect(function() 
+    if isRainbow then
+        stroke.Color = Color3.fromHSV((tick() * 0.2) % 1, 0.8, 1) 
+    end
+end)
 
 local header = Instance.new("TextLabel", main)
 header.Size = UDim2.new(1, -110, 0, 40); header.Position = UDim2.new(0, 110, 0, 5)
 header.Text = "Meknoyu Gui | Hub"; header.BackgroundTransparency = 1; header.TextColor3 = Color3.new(1,1,1); header.Font = Enum.Font.GothamBold; header.TextSize = 18; header.TextXAlignment = Enum.TextXAlignment.Left
 local closeBtn = Instance.new("TextButton", main); closeBtn.Size = UDim2.new(0, 30, 0, 30); closeBtn.Position = UDim2.new(1, -35, 0, 7); closeBtn.Text = "X"; closeBtn.TextColor3 = Color3.new(1,0,0); closeBtn.BackgroundColor3 = Color3.fromRGB(40,40,40); Instance.new("UICorner", closeBtn)
-local miniBtn = Instance.new("TextButton", screenGui); miniBtn.Size = UDim2.new(0, 50, 0, 50); miniBtn.Position = UDim2.new(0.9, 0, 0.05, 0); miniBtn.Text = "MEKNO"; miniBtn.BackgroundColor3 = Color3.fromRGB(20,20,20); miniBtn.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", miniBtn).CornerRadius = UDim.new(1,0); miniBtn.Draggable = true; miniBtn.Visible = false
-closeBtn.MouseButton1Click:Connect(function() main.Visible = false; miniBtn.Visible = true end)
-miniBtn.MouseButton1Click:Connect(function() main.Visible = true; miniBtn.Visible = false end)
+
+-- ==========================================
+--        SISTEM ANIMASI TWEEN (OPEN/CLOSE)
+-- ==========================================
+local originalMainSize = UDim2.new(0, 450, 0, 300)
+local originalMainPos = UDim2.new(0.5, -225, 0.5, -150)
+local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+
+closeBtn.MouseButton1Click:Connect(function()
+    local closeTween = TweenService:Create(main, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Size = UDim2.new(0, 0, 0, 0),
+        Position = UDim2.new(main.Position.X.Scale, main.Position.Y.Offset + (main.Size.Y.Offset/2), main.Position.Y.Scale, main.Position.Y.Offset + (main.Size.Y.Offset/2))
+    })
+    closeTween:Play()
+    closeTween.Completed:Connect(function()
+        main.Visible = false
+        miniBtn.Visible = true
+        main.Size = originalMainSize
+        main.Position = originalMainPos
+    end)
+end)
+
+miniBtn.MouseButton1Click:Connect(function()
+    miniBtn.Visible = false
+    main.Size = UDim2.new(0, 0, 0, 0)
+    main.Position = originalMainPos
+    main.Visible = true
+    
+    local openTween = TweenService:Create(main, tweenInfo, {
+        Size = originalMainSize,
+        Position = originalMainPos
+    })
+    openTween:Play()
+end)
 
 local tabContainer = Instance.new("ScrollingFrame", main)
-tabContainer.Size = UDim2.new(0, 100, 1, -10)
+tabContainer.Size = UDim2.new(0, 100, 1, -85)
 tabContainer.Position = UDim2.new(0, 5, 0, 5)
 tabContainer.BackgroundTransparency = 1
 tabContainer.ScrollBarThickness = 0
-tabContainer.CanvasSize = UDim2.new(0, 0, 1.5, 0)
+tabContainer.CanvasSize = UDim2.new(0, 0, 1.8, 0)
 local UIList = Instance.new("UIListLayout", tabContainer); UIList.Padding = UDim.new(0, 5)
+
+-- ==========================================
+--        SISTEM PROFIL POJOK KIRI BAWAH
+-- ==========================================
+local profileFrame = Instance.new("Frame", main)
+profileFrame.Size = UDim2.new(0, 100, 0, 70)
+profileFrame.Position = UDim2.new(0, 5, 1, -75)
+profileFrame.BackgroundTransparency = 1
+
+local profilePic = Instance.new("ImageLabel", profileFrame)
+profilePic.Size = UDim2.new(0, 32, 0, 32)
+profilePic.Position = UDim2.new(0, 2, 0, 5)
+profilePic.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+profilePic.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. plr.UserId .. "&width=150&height=150&format=png"
+Instance.new("UICorner", profilePic).CornerRadius = UDim.new(1, 0)
+
+local profileStroke = Instance.new("UIStroke", profilePic)
+profileStroke.Thickness = 1.5
+
+-- Membuat Outline Bulat Foto Profil Menjadi Rainbow
+rs.RenderStepped:Connect(function()
+    profileStroke.Color = Color3.fromHSV((tick() * 0.3) % 1, 0.8, 1)
+end)
+
+-- Baris Atas: Name
+local displayNameLabel = Instance.new("TextLabel", profileFrame)
+displayNameLabel.Size = UDim2.new(0, 60, 0, 12)
+displayNameLabel.Position = UDim2.new(0, 38, 0, 2)
+displayNameLabel.BackgroundTransparency = 1
+displayNameLabel.Text = "Name: " .. plr.DisplayName
+displayNameLabel.TextColor3 = Color3.fromRGB(160, 32, 240)
+displayNameLabel.Font = Enum.Font.GothamBold
+displayNameLabel.TextSize = 8
+displayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Baris Tengah: Username
+local usernameLabel = Instance.new("TextLabel", profileFrame)
+usernameLabel.Size = UDim2.new(0, 60, 0, 12)
+usernameLabel.Position = UDim2.new(0, 38, 0, 14)
+usernameLabel.BackgroundTransparency = 1
+usernameLabel.Text = "@" .. plr.Name
+usernameLabel.Font = Enum.Font.GothamMedium
+usernameLabel.TextSize = 8
+usernameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local grad = Instance.new("UIGradient", usernameLabel)
+grad.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 100, 0)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 50))
+})
+
+-- Baris Bawah: UserID
+local useridLabel = Instance.new("TextLabel", profileFrame)
+useridLabel.Size = UDim2.new(0, 60, 0, 12)
+useridLabel.Position = UDim2.new(0, 38, 0, 26)
+useridLabel.BackgroundTransparency = 1
+useridLabel.Text = "UserID: " .. plr.UserId
+useridLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+useridLabel.Font = Enum.Font.GothamMedium
+useridLabel.TextSize = 7
+useridLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 local pages = Instance.new("Frame", main); pages.Size = UDim2.new(1, -115, 1, -50); pages.Position = UDim2.new(0, 110, 0, 45); pages.BackgroundTransparency = 1
 
 local function createPage(name)
-    local p = Instance.new("ScrollingFrame", pages); p.Name = name; p.Size = UDim2.new(1, 0, 1, 0); p.Visible = false; p.BackgroundTransparency = 1; p.ScrollBarThickness = 2; p.CanvasSize = UDim2.new(0, 0, 3.5, 0)
+    local p = Instance.new("ScrollingFrame", pages); p.Name = name; p.Size = UDim2.new(1, 0, 1, 0); p.Visible = false; p.BackgroundTransparency = 1; p.ScrollBarThickness = 2; p.CanvasSize = UDim2.new(0, 0, 2.5, 0)
     local grid = Instance.new("UIGridLayout", p); grid.CellSize = UDim2.new(0.48, 0, 0, 35); grid.CellPadding = UDim2.new(0, 5, 0, 5)
     return p
 end
@@ -226,25 +328,239 @@ end
 local pageMain = createPage("Main")
 local pageNoToggle = createPage("NoToggle")
 local pageSelectAnti = createPage("SelectAnti")
-local pageInfo = createPage("Info")
+local pageInfo = Instance.new("ScrollingFrame", pages); pageInfo.Name = "Info"; pageInfo.Size = UDim2.new(1, 0, 1, 0); pageInfo.Visible = false; pageInfo.BackgroundTransparency = 1; pageInfo.ScrollBarThickness = 2; pageInfo.CanvasSize = UDim2.new(0, 0, 1.5, 0)
 local pageGames = createPage("Games")
 local pageServer = createPage("Server")
 
+-- Membuat halaman khusus Kustomisasi (Customize)
+local pageCustomize = Instance.new("ScrollingFrame", pages)
+pageCustomize.Name = "Customize"
+pageCustomize.Size = UDim2.new(1, 0, 1, 0)
+pageCustomize.Visible = false
+pageCustomize.BackgroundTransparency = 1
+pageCustomize.ScrollBarThickness = 2
+pageCustomize.CanvasSize = UDim2.new(0, 0, 2.5, 0)
+local custLayout = Instance.new("UIListLayout", pageCustomize)
+custLayout.Padding = UDim.new(0, 8)
+custLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
 local function addTab(name, targetPage)
-    local btn = Instance.new("TextButton", tabContainer); btn.Size = UDim2.new(1, 0, 0, 30); btn.Text = name; btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); btn.TextColor3 = Color3.new(1,1,1); btn.Font = Enum.Font.GothamBold; btn.TextSize = 10; Instance.new("UICorner", btn)
+    local btn = Instance.new("TextButton", tabContainer); btn.Size = UDim2.new(1, 0, 0, 26); btn.Text = name; btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); btn.TextColor3 = Color3.new(1,1,1); btn.Font = Enum.Font.GothamBold; btn.TextSize = 10; Instance.new("UICorner", btn)
     btn.MouseButton1Click:Connect(function() for _, v in pairs(pages:GetChildren()) do v.Visible = false end; targetPage.Visible = true end)
 end
 
 addTab("Main", pageMain)
 addTab("No Toggle", pageNoToggle)
 addTab("Select Anti", pageSelectAnti)
+addTab("Customize", pageCustomize)
 addTab("Info", pageInfo)
 addTab("Games", pageGames)
 addTab("Server", pageServer)
 
+-- ==========================================
+--        ISI KONTEN TAB CUSTOMIZE
+-- ==========================================
+
+-- --- DROPDOWN 1: CUSTOM UI ---
+local dropUIFrame = Instance.new("Frame", pageCustomize)
+dropUIFrame.Size = UDim2.new(0.95, 0, 0, 35)
+dropUIFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 27)
+Instance.new("UICorner", dropUIFrame).CornerRadius = UDim.new(0, 5)
+local dropUIStroke = Instance.new("UIStroke", dropUIFrame)
+dropUIStroke.Color = Color3.fromRGB(45, 45, 50)
+
+local dropUIText = Instance.new("TextButton", dropUIFrame)
+dropUIText.Size = UDim2.new(1, 0, 1, 0)
+dropUIText.BackgroundTransparency = 1
+dropUIText.Text = "  Custom UI"
+dropUIText.TextColor3 = Color3.fromRGB(230, 230, 230)
+dropUIText.Font = Enum.Font.GothamBold
+dropUIText.TextSize = 12
+dropUIText.TextXAlignment = Enum.TextXAlignment.Left
+
+local dropUIArrow = Instance.new("TextLabel", dropUIFrame)
+dropUIArrow.Size = UDim2.new(0, 30, 1, 0)
+dropUIArrow.Position = UDim2.new(1, -30, 0, 0)
+dropUIArrow.BackgroundTransparency = 1
+dropUIArrow.Text = "V"
+dropUIArrow.TextColor3 = Color3.fromRGB(150, 150, 150)
+dropUIArrow.Font = Enum.Font.GothamBold
+dropUIArrow.TextSize = 11
+
+local contentUIFrame = Instance.new("Frame", pageCustomize)
+contentUIFrame.Size = UDim2.new(0.95, 0, 0, 115) -- Diperpanjang ukurannya untuk memuat Input Sky ID
+contentUIFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+contentUIFrame.Visible = false
+Instance.new("UICorner", contentUIFrame).CornerRadius = UDim.new(0, 5)
+
+local sliderTitle = Instance.new("TextLabel", contentUIFrame)
+sliderTitle.Size = UDim2.new(1, 0, 0, 20)
+sliderTitle.Position = UDim2.new(0, 10, 0, 5)
+sliderTitle.BackgroundTransparency = 1
+sliderTitle.Text = "Transparency UI"
+sliderTitle.TextColor3 = Color3.fromRGB(180, 180, 180)
+sliderTitle.Font = Enum.Font.GothamSemibold
+sliderTitle.TextSize = 11
+sliderTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local sliderTrack = Instance.new("Frame", contentUIFrame)
+sliderTrack.Size = UDim2.new(0.85, 0, 0, 5)
+sliderTrack.Position = UDim2.new(0.075, 0, 0, 32)
+sliderTrack.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+sliderTrack.BorderSizePixel = 0
+
+local sliderThumb = Instance.new("TextButton", sliderTrack)
+sliderThumb.Size = UDim2.new(0, 12, 0, 12)
+sliderThumb.Position = UDim2.new(0, -6, 0.5, -6)
+sliderThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+sliderThumb.Text = ""
+Instance.new("UICorner", sliderThumb).CornerRadius = UDim.new(1, 0)
+
+local sliderValueLabel = Instance.new("TextLabel", contentUIFrame)
+sliderValueLabel.Size = UDim2.new(1, 0, 0, 20)
+sliderValueLabel.Position = UDim2.new(0, 0, 0, 43)
+sliderValueLabel.BackgroundTransparency = 1
+sliderValueLabel.Text = "Transparency: 0"
+sliderValueLabel.TextColor3 = Color3.fromRGB(0, 255, 140)
+sliderValueLabel.Font = Enum.Font.GothamMedium
+sliderValueLabel.TextSize = 11
+
+-- KOTAKAN INPUT SKY ID (MURNI HANYA UNTUK PASANG ID SKY KUSTOM)
+local skyIdBox = Instance.new("TextBox", contentUIFrame)
+skyIdBox.Size = UDim2.new(0.85, 0, 0, 30)
+skyIdBox.Position = UDim2.new(0.075, 0, 0, 75)
+skyIdBox.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+skyIdBox.Text = ""
+skyIdBox.PlaceholderText = "Put Sky ID Here"
+skyIdBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+skyIdBox.Font = Enum.Font.Code
+skyIdBox.TextSize = 11
+Instance.new("UICorner", skyIdBox).CornerRadius = UDim.new(0, 4)
+local skyIdStroke = Instance.new("UIStroke", skyIdBox)
+skyIdStroke.Color = Color3.fromRGB(60, 60, 65)
+
+skyIdBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed and skyIdBox.Text ~= "" then
+        local id = tonumber(skyIdBox.Text) or skyIdBox.Text:match("%d+")
+        if id then
+            local targetAsset = "http://www.roblox.com/asset/?id=" .. id
+            discoSky.SkyboxBk = targetAsset
+            discoSky.SkyboxDn = targetAsset
+            discoSky.SkyboxFt = targetAsset
+            discoSky.SkyboxLf = targetAsset
+            discoSky.SkyboxRt = targetAsset
+            discoSky.SkyboxUp = targetAsset
+            if states.disco then
+                discoSky.Parent = nil
+                discoSky.Parent = lighting
+            end
+        end
+    end
+end)
+
+local uiOpen = false
+dropUIText.MouseButton1Click:Connect(function()
+    uiOpen = not uiOpen
+    contentUIFrame.Visible = uiOpen
+    dropUIArrow.Text = uiOpen and "^" or "V"
+end)
+
+local sliding = false
+local function updateSlider()
+    if not sliding then return end
+    local mX = UIS:GetMouseLocation().X
+    local tX = sliderTrack.AbsolutePosition.X
+    local tW = sliderTrack.AbsoluteSize.X
+    local pct = math.clamp((mX - tX) / tW, 0, 1)
+    
+    sliderThumb.Position = UDim2.new(pct, -6, 0.5, -6)
+    local rawVal = math.round(pct * 10)
+    sliderValueLabel.Text = "Transparency: " .. rawVal
+    
+    main.BackgroundTransparency = rawVal / 10
+end
+sliderThumb.MouseButton1Down:Connect(function() sliding = true end)
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        sliding = false
+    end
+end)
+rs.RenderStepped:Connect(updateSlider)
+
+-- --- DROPDOWN 2: COLORS UI ---
+local dropColFrame = Instance.new("Frame", pageCustomize)
+dropColFrame.Size = UDim2.new(0.95, 0, 0, 35)
+dropColFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 27)
+Instance.new("UICorner", dropColFrame).CornerRadius = UDim.new(0, 5)
+local dropColStroke = Instance.new("UIStroke", dropColFrame)
+dropColStroke.Color = Color3.fromRGB(45, 45, 50)
+
+local dropColText = Instance.new("TextButton", dropColFrame)
+dropColText.Size = UDim2.new(1, 0, 1, 0)
+dropColText.BackgroundTransparency = 1
+dropColText.Text = "  Colors UI"
+dropColText.TextColor3 = Color3.fromRGB(230, 230, 230)
+dropColText.Font = Enum.Font.GothamBold
+dropColText.TextSize = 12
+dropColText.TextXAlignment = Enum.TextXAlignment.Left
+
+local dropColArrow = Instance.new("TextLabel", dropColFrame)
+dropColArrow.Size = UDim2.new(0, 30, 1, 0)
+dropColArrow.Position = UDim2.new(1, -30, 0, 0)
+dropColArrow.BackgroundTransparency = 1
+dropColArrow.Text = "V"
+dropColArrow.TextColor3 = Color3.fromRGB(150, 150, 150)
+dropColArrow.Font = Enum.Font.GothamBold
+dropColArrow.TextSize = 11
+
+local contentColFrame = Instance.new("Frame", pageCustomize)
+contentColFrame.Size = UDim2.new(0.95, 0, 0, 75)
+contentColFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+contentColFrame.Visible = false
+Instance.new("UICorner", contentColFrame).CornerRadius = UDim.new(0, 5)
+
+local colGrid = Instance.new("UIGridLayout", contentColFrame)
+colGrid.CellSize = UDim2.new(0, 22, 0, 22)
+colGrid.CellPadding = UDim2.new(0, 8, 0, 6)
+colGrid.SortOrder = Enum.SortOrder.LayoutOrder
+
+local padingGrid = Instance.new("UIPadding", contentColFrame)
+padingGrid.PaddingTop = UDim.new(0, 6)
+padingGrid.PaddingLeft = UDim.new(0, 10)
+
+local colorPalette = {
+    Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 0, 255), Color3.fromRGB(255, 255, 0), Color3.fromRGB(255, 0, 255),
+    Color3.fromRGB(0, 255, 255), Color3.fromRGB(255, 128, 0), Color3.fromRGB(128, 0, 255),
+    Color3.fromRGB(255, 0, 128), Color3.fromRGB(0, 255, 128), Color3.fromRGB(15, 15, 15)
+}
+
+for i, color in ipairs(colorPalette) do
+    local colorBox = Instance.new("TextButton", contentColFrame)
+    colorBox.Text = ""
+    colorBox.BackgroundColor3 = color
+    colorBox.BorderSizePixel = 0
+    Instance.new("UICorner", colorBox).CornerRadius = UDim.new(0, 4)
+    
+    colorBox.MouseButton1Click:Connect(function()
+        main.BackgroundColor3 = color
+    end)
+end
+
+local colOpen = false
+dropColText.MouseButton1Click:Connect(function()
+    colOpen = not colOpen
+    contentColFrame.Visible = colOpen
+    dropColArrow.Text = colOpen and "^" or "V"
+end)
+
 -- // TAB INFO CONTENT //
 local infoText = Instance.new("TextLabel", pageInfo)
-infoText.Size = UDim2.new(0.95, 0, 0, 200); infoText.Position = UDim2.new(0.025, 0, 0, 5); infoText.BackgroundTransparency = 1; infoText.TextColor3 = Color3.fromRGB(255, 255, 255); infoText.TextSize = 13; infoText.Font = Enum.Font.GothamMedium; infoText.TextWrapped = true; infoText.TextXAlignment = Enum.TextXAlignment.Left; infoText.TextYAlignment = Enum.TextYAlignment.Top; infoText.Text = "This script is strictly guarded and secure. There is no account theft or fraud. This script is securely protected, and no malicious bots will steal your data.\n\nCreated by Progaming Meknoyu Script"
+infoText.Size = UDim2.new(0.95, 0, 0, 350); infoText.Position = UDim2.new(0.025, 0, 0, 5)
+infoText.BackgroundTransparency = 1; infoText.TextColor3 = Color3.fromRGB(255, 255, 255)
+infoText.TextSize = 12; infoText.Font = Enum.Font.GothamMedium; infoText.TextWrapped = true
+infoText.TextXAlignment = Enum.TextXAlignment.Left; infoText.TextYAlignment = Enum.TextYAlignment.Top
+infoText.Text = "This script is strictly guarded and secure. There is no account theft or fraud. This script is securely protected, and no malicious bots will steal your data.\n\nCreated by Progaming Meknoyu Script.\n\nAll Engine Core modules, anti-detection filters, and local virtualization protocols are managed natively. Optimization systems are running automatically in the background to ensure stable FPS."
 
 -- // TAB GAMES CONTENT //
 local function createGameBtn(name, parent, func)
@@ -362,9 +678,8 @@ local function createToggleBtn(name, key, parent)
         elseif key == "addpart" and not states.addpart then if platformPart then platformPart:Destroy(); platformPart = nil end
         elseif key == "antirobux" and not states.antirobux then pcall(function() guiService.MenuOpened:Disconnect() end)
         elseif key == "xray" and not states.xray then for obj, trans in pairs(originalTransparencies) do if obj and obj.Parent then obj.Transparency = trans end end; originalTransparencies = {}
-        elseif key == "antitel" and states.antitel then if hrp then lastPos = hrp.CFrame end -- Ambil posisi saat ini begitu Anti Teleport dinyalakan
+        elseif key == "antitel" and states.antitel then if hrp then lastPos = hrp.CFrame end
         elseif key == "antifling" and not states.antifling then
-            -- INSTANTLY RESTORE COLLISION WHEN ANTI-FLING IS TURNED OFF
             if plr.Character then
                 for _, part in pairs(plr.Character:GetDescendants()) do
                     if part:IsA("BasePart") then part.CanCollide = true end
@@ -494,7 +809,7 @@ local function miniFling(playerToFling)
             if rootPart and targetRootPart then
                 rootPart.CFrame = targetRootPart.CFrame * CFrame.new(0, 0, 0)
                 rootPart.Velocity = targetRootPart.Velocity * 10000 + Vector3.new(0, 10000, 0)
-                rootPart.RotVelocity = Vector3.new(0, 0, 0) -- REMOVED SPIN ON INDIVIDUAL FLING TOO
+                rootPart.RotVelocity = Vector3.new(0, 0, 0)
             end
             task.wait()
         until not targetRootPart or targetRootPart.Parent ~= targetCharacter or targetRootPart.Velocity.Magnitude > 150 or targetHumanoid.Health <= 0 or targetHumanoid.Sit or tick() > Time + 2
@@ -545,7 +860,7 @@ rs.Heartbeat:Connect(function()
             rs.RenderStepped:Wait()
             if hrp then
                 hrp.Velocity = currentVel
-                hrp.RotVelocity = Vector3.new(0, 0, 0) -- FIXED: REMOVED SPIN/ROTATION
+                hrp.RotVelocity = Vector3.new(0, 0, 0)
             end
         end
     end
@@ -565,20 +880,16 @@ rs.RenderStepped:Connect(function()
     if states.antirobux then mps.PromptPurchaseFinished:Connect(function() return nil end); mps.PromptProductPurchaseFinished:Connect(function() return nil end) end
     if states.antiafk then pcall(function() guiService:SetMenuIsOpen(false) end) end
     
-    -- [[ FIXED ANTI FLING & NO COLLISION ALL PLAYERS ]] --
     if states.antifling or states.antirag then 
         hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
         hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
         
         if states.antifling then
-            -- MENGUBAH LOGIKA: Karakter sendiri tetap CanCollide = true agar tidak noclip ke objek/map.
-            -- Hanya mengatur part dari semua player lain agar dinonaktifkan collision-nya terhadap kita secara lokal.
             for _, p in pairs(players:GetPlayers()) do
                 if p ~= plr and p.Character then
                     for _, part in pairs(p.Character:GetDescendants()) do
                         if part:IsA("BasePart") then
                             part.CanCollide = false
-                            -- Menghilangkan velocity ekstrem dari player lain yang mencoba mem-fling
                             if part.Velocity.Magnitude > 100 or part.RotVelocity.Magnitude > 100 then
                                 part.Velocity = Vector3.new(0,0,0)
                                 part.RotVelocity = Vector3.new(0,0,0)
@@ -590,10 +901,8 @@ rs.RenderStepped:Connect(function()
         end
     end
     
-    -- [[ FIXED ANTI TELEPORT LOGIC ]] --
     if states.antitel and lastPos then 
         local distance = (hrp.Position - lastPos.Position).Magnitude
-        -- Menjaga posisi jika ada perpindahan paksa dari server (melebihi jarak 40 studs)
         if distance > 40 and not (states.speed or states.tooltp or states.savepos or states.tpKill or states.antifling or states.fling) then 
             hrp.Velocity = Vector3.new(0,0,0)
             hrp.CFrame = lastPos 
@@ -616,22 +925,44 @@ rs.RenderStepped:Connect(function()
     if states.speed and hum.MoveDirection.Magnitude > 0 then hrp.CFrame = hrp.CFrame + (hum.MoveDirection * 1.5) end
 end)
 
+-- ==========================================================
+--    SISTEM DETEKSI DEVICE (NOTIFIKASI MOBILE / BULAT)
+-- ==========================================================
+task.defer(function()
+    local bindable = Instance.new("BindableFunction")
+    
+    bindable.OnInvoke = function(choice)
+        if choice == "Yes" or choice == "No" then
+            main.Size = UDim2.new(0, 0, 0, 0)
+            main.Position = originalMainPos
+            main.Visible = false
+            miniBtn.Visible = true
+        end
+    end
+    
+    starterGui:SetCore("SendNotification", {
+        Title = "Nama Device Mobile",
+        Text = "Are you a mobile device?",
+        Duration = 15,
+        Callback = bindable,
+        Button1 = "Yes",
+        Button2 = "No"
+    })
+end)
+
 end
 
 -- ==========================================================
 --    LOGIKA BYPASS OWNER & INITIALIZATION KEY SYSTEM
 -- ==========================================================
 if plr.Name == "Meknoyu" then
-    -- OWNER BYPASS KEY SYSTEM
     mainEngineLoad()
 else
-    -- USER BIASA WAJIB KEY SYSTEM
     local keyVerified = false
     local currentGeneratedKey = ""
     local fileName = "Meknoyu_KeyData.json"
     local HttpService = game:GetService("HttpService")
 
-    -- FUNGSI SIMPAN KEY KE PERANGKAT
     local function saveKeyToDevice(key, durationInSeconds)
         local data = {
             SavedKey = key,
@@ -644,7 +975,6 @@ else
         end)
     end
 
-    -- FUNGSI CEK KEY YANG TERSIMPAN
     local function checkSavedKey()
         if not readfile or not isfile then return false end
         if isfile(fileName) then
@@ -652,12 +982,10 @@ else
             if success then
                 local success2, data = pcall(function() return HttpService:JSONDecode(content) end)
                 if success2 and data and data.SavedKey and data.ExpireTime then
-                    -- Cek apakah waktu saat ini masih kurang dari waktu kedaluwarsa
                     if os.time() < data.ExpireTime then
                         currentGeneratedKey = data.SavedKey
                         return true
                     else
-                        -- Jika sudah kedaluwarsa, hapus filenya
                         pcall(delfile, fileName)
                     end
                 end
@@ -666,7 +994,6 @@ else
         return false
     end
 
-    -- Cek otomatis saat pasang script, kalau key masih valid langsung load engine tanpa muncul GUI key
     if checkSavedKey() then
         mainEngineLoad()
         return 
@@ -739,9 +1066,6 @@ else
     Instance.new("UICorner", confirmBtn)
     confirmBtn.Parent = keyGui
 
-    -- ==========================================
-    --        QUEST SYSTEM MENU & COOLDOWN
-    -- ==========================================
     local questFrame = Instance.new("Frame")
     questFrame.Size = UDim2.new(0, 340, 0, 190)
     questFrame.Position = UDim2.new(0.025, 0, 0, 185)
@@ -814,9 +1138,6 @@ else
         end)
     end
 
-    -- ==========================================
-    --        GUI COPY YOUR KEY PAGE
-    -- ==========================================
     local copyKeyGui = Instance.new("Frame")
     copyKeyGui.Name = "CopyKeyGui"
     copyKeyGui.Size = UDim2.new(1, 0, 1, 0)
@@ -913,7 +1234,6 @@ else
     confirmBtn.MouseButton1Click:Connect(function()
         if keyTextBox.Text == currentGeneratedKey and currentGeneratedKey ~= "" then
             keyVerified = true
-            -- SIMPAN KEY KE WORKSPACE EXECUTOR (Durasi: 86340 detik = 23 jam 59 menit)
             saveKeyToDevice(currentGeneratedKey, 86340)
             keyGui:Destroy() 
             mainEngineLoad()     
