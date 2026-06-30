@@ -199,13 +199,31 @@ main.Active = true; main.Draggable = true; Instance.new("UICorner", main)
 local stroke = Instance.new("UIStroke", main)
 stroke.Thickness = 2.5
 
-local miniBtn = Instance.new("TextButton", screenGui); miniBtn.Size = UDim2.new(0, 50, 0, 50); miniBtn.Position = UDim2.new(0.9, 0, 0.05, 0); miniBtn.Text = "MEKNO"; miniBtn.BackgroundColor3 = Color3.fromRGB(20,20,20); miniBtn.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", miniBtn).CornerRadius = UDim.new(1,0); miniBtn.Draggable = true; miniBtn.Visible = false
+-- KUSTOMISASI MINI BUTTON BARU (PANJANG PENDEK, POSITION TENGAH ATAS, TEXT MEKNOYU GUI, RAINBOW OUTLINE)
+local miniBtn = Instance.new("TextButton", screenGui)
+miniBtn.Size = UDim2.new(0, 120, 0, 32)
+miniBtn.Position = UDim2.new(0.5, -60, 0.12, 0)
+miniBtn.Text = "Meknoyu GUI"
+miniBtn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+miniBtn.TextColor3 = Color3.new(1,1,1)
+miniBtn.Font = Enum.Font.GothamBold
+miniBtn.TextSize = 12
+miniBtn.Draggable = true
+miniBtn.Visible = false
+
+local miniCorner = Instance.new("UICorner", miniBtn)
+miniCorner.CornerRadius = UDim.new(0, 6)
+
+local miniStroke = Instance.new("UIStroke", miniBtn)
+miniStroke.Thickness = 1.8
 
 local isRainbow = true
 local rainbowConnection
 rainbowConnection = rs.RenderStepped:Connect(function() 
     if isRainbow then
-        stroke.Color = Color3.fromHSV((tick() * 0.2) % 1, 0.8, 1) 
+        local hue = (tick() * 0.15) % 1
+        stroke.Color = Color3.fromHSV(hue, 0.8, 1) 
+        miniStroke.Color = Color3.fromHSV(hue, 0.8, 1) -- Efek rainbow pelan untuk outline mini button
     end
 end)
 
@@ -367,7 +385,12 @@ dropUIFrame.Size = UDim2.new(0.95, 0, 0, 35)
 dropUIFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 27)
 Instance.new("UICorner", dropUIFrame).CornerRadius = UDim.new(0, 5)
 local dropUIStroke = Instance.new("UIStroke", dropUIFrame)
-dropUIStroke.Color = Color3.fromRGB(45, 45, 50)
+dropUIStroke.Thickness = 2 -- Ketebalan outline rainbow dropdown Custom UI
+
+-- Loop RenderStepped untuk membuat luar garis Dropdown Custom UI menjadi Rainbow Lambat
+rs.RenderStepped:Connect(function()
+    dropUIStroke.Color = Color3.fromHSV((tick() * 0.1) % 1, 0.8, 1)
+end)
 
 local dropUIText = Instance.new("TextButton", dropUIFrame)
 dropUIText.Size = UDim2.new(1, 0, 1, 0)
@@ -493,7 +516,12 @@ dropColFrame.Size = UDim2.new(0.95, 0, 0, 35)
 dropColFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 27)
 Instance.new("UICorner", dropColFrame).CornerRadius = UDim.new(0, 5)
 local dropColStroke = Instance.new("UIStroke", dropColFrame)
-dropColStroke.Color = Color3.fromRGB(45, 45, 50)
+dropColStroke.Thickness = 2 -- Ketebalan outline rainbow dropdown Colors UI
+
+-- Loop RenderStepped untuk membuat luar garis Dropdown Colors UI menjadi Rainbow Lambat
+rs.RenderStepped:Connect(function()
+    dropColStroke.Color = Color3.fromHSV((tick() * 0.1) % 1, 0.8, 1)
+end)
 
 local dropColText = Instance.new("TextButton", dropColFrame)
 dropColText.Size = UDim2.new(1, 0, 1, 0)
@@ -518,6 +546,13 @@ contentColFrame.Size = UDim2.new(0.95, 0, 0, 75)
 contentColFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 contentColFrame.Visible = false
 Instance.new("UICorner", contentColFrame).CornerRadius = UDim.new(0, 5)
+
+-- TAMBAHKAN GARIS OUTLINE RAINBOW UNTUK WARNA BAGIAN BAWAH (CONTENT FRAME PALETTE)
+local contentColStroke = Instance.new("UIStroke", contentColFrame)
+contentColStroke.Thickness = 1.5
+rs.RenderStepped:Connect(function()
+    contentColStroke.Color = Color3.fromHSV((tick() * 0.1) % 1, 0.8, 1)
+end)
 
 local colGrid = Instance.new("UIGridLayout", contentColFrame)
 colGrid.CellSize = UDim2.new(0, 22, 0, 22)
@@ -920,7 +955,7 @@ rs.RenderStepped:Connect(function()
     if states.hcxxr then lighting.Ambient = Color3.fromRGB(255, 0, 0); lighting.OutdoorAmbient = Color3.fromRGB(150, 0, 0); for _, p in pairs(players:GetPlayers()) do if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then local root = p.Character.HumanoidRootPart; if not root:FindFirstChild("MeknoFire") then local f = Instance.new("Fire", root); f.Name = "MeknoFire"; f.Heat = 25; f.Size = 15; f.Color = Color3.fromRGB(255, 0, 0); f.SecondaryColor = Color3.fromRGB(100, 0, 0) end; for _, part in pairs(p.Character:GetDescendants()) do if part:IsA("BasePart") or part:IsA("Decal") then if part.Name == "HumanoidRootPart" then continue end; part.Transparency = 0 end end end end end
     if states.aimActive and not states.tpKill then local target = nil; local shortDistance = math.huge; for _, p in pairs(players:GetPlayers()) do if p ~= plr and p.Character and p.Character:FindFirstChild("Head") and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0 then if not plr.Team or p.Team ~= plr.Team or plr.Team == nil then local head = p.Character.Head; local currentDist = (head.Position - hrp.Position).Magnitude; if currentDist < shortDistance then target = head; shortDistance = currentDist end end end end; if target then cam.CFrame = CFrame.lookAt(cam.CFrame.Position, target.Position); local currentTool = char:FindFirstChildOfClass("Tool"); if currentTool then currentTool:Activate() end end end
     if states.esp then for _, p in pairs(players:GetPlayers()) do if p ~= plr and p.Character and not p.Character:FindFirstChild("MeknoHighlight") then Instance.new("Highlight", p.Character).Name = "MeknoHighlight" end end end
-    if states.title then local head = plr.Character and plr.Character:FindFirstChild("Head"); if head then local t = head:FindFirstChild("MeknoTitle"); if not t then t = Instance.new("BillboardGui"); t.Name = "MeknoTitle"; t.Size = UDim2.new(0, 200, 0, 50); t.AlwaysOnTop = true; t.Adornee = head; t.StudsOffset = Vector3.new(0, 3, 0); local txt = Instance.new("TextLabel", t); txt.Size = UDim2.new(1, 0, 1, 0); txt.BackgroundTransparency = 1; txt.TextColor3 = Color3.fromRGB(255, 0, 0); txt.Font = Enum.Font.GothamBold; txt.TextSize = 18; txt.Text = "Meknoyu Here"; t.Parent = head; txt.Parent = t end end elseif not states.title then if plr.Character and plr.Character:FindFirstChild("Head") and plr.Character.Head:FindFirstChild("MeknoTitle") then plr.Character.Head.MeknoTitle:Destroy() end end
+    if states.title then local head = plr.Character and plr.Character:FindFirstChild("Head"); if head then local t = head:FindFirstChild("MeknoTitle"); if not t then t = Instance.new("BillboardGui"); t.Name = "MeknoTitle"; t.Size = UDim2.new(0, 200, 0, 50); t.AlwaysOnTop = true; t.Adornee = head; t.StudsOffset = Vector3.new(0, 3, 0); local txt = Instance.new("TextLabel", txt); txt.Size = UDim2.new(1, 0, 1, 0); txt.BackgroundTransparency = 1; txt.TextColor3 = Color3.fromRGB(255, 0, 0); txt.Font = Enum.Font.GothamBold; txt.TextSize = 18; txt.Text = "Meknoyu Here"; t.Parent = head; txt.Parent = t end end elseif not states.title then if plr.Character and plr.Character:FindFirstChild("Head") and plr.Character.Head:FindFirstChild("MeknoTitle") then plr.Character.Head.MeknoTitle:Destroy() end end
     if states.noclip then for _, v in pairs(char:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end
     if states.speed and hum.MoveDirection.Magnitude > 0 then hrp.CFrame = hrp.CFrame + (hum.MoveDirection * 1.5) end
 end)
@@ -941,7 +976,7 @@ task.defer(function()
     end
     
     starterGui:SetCore("SendNotification", {
-        Title = "Nama Device Mobile",
+        Title = "Device Mobile",
         Text = "Are you a mobile device?",
         Duration = 15,
         Callback = bindable,
