@@ -411,7 +411,7 @@ dropUIArrow.Font = Enum.Font.GothamBold
 dropUIArrow.TextSize = 11
 
 local contentUIFrame = Instance.new("Frame", pageCustomize)
-contentUIFrame.Size = UDim2.new(0.95, 0, 0, 115) -- Diperpanjang ukurannya untuk memuat Input Sky ID
+contentUIFrame.Size = UDim2.new(0.95, 0, 0, 75) -- Dikembalikan ukurannya ke 75 karena kotak Sky ID dihapus
 contentUIFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 contentUIFrame.Visible = false
 Instance.new("UICorner", contentUIFrame).CornerRadius = UDim.new(0, 5)
@@ -447,39 +447,6 @@ sliderValueLabel.Text = "Transparency: 0"
 sliderValueLabel.TextColor3 = Color3.fromRGB(0, 255, 140)
 sliderValueLabel.Font = Enum.Font.GothamMedium
 sliderValueLabel.TextSize = 11
-
--- KOTAKAN INPUT SKY ID (MURNI HANYA UNTUK PASANG ID SKY KUSTOM)
-local skyIdBox = Instance.new("TextBox", contentUIFrame)
-skyIdBox.Size = UDim2.new(0.85, 0, 0, 30)
-skyIdBox.Position = UDim2.new(0.075, 0, 0, 75)
-skyIdBox.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-skyIdBox.Text = ""
-skyIdBox.PlaceholderText = "Put Sky ID Here"
-skyIdBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-skyIdBox.Font = Enum.Font.Code
-skyIdBox.TextSize = 11
-Instance.new("UICorner", skyIdBox).CornerRadius = UDim.new(0, 4)
-local skyIdStroke = Instance.new("UIStroke", skyIdBox)
-skyIdStroke.Color = Color3.fromRGB(60, 60, 65)
-
-skyIdBox.FocusLost:Connect(function(enterPressed)
-    if enterPressed and skyIdBox.Text ~= "" then
-        local id = tonumber(skyIdBox.Text) or skyIdBox.Text:match("%d+")
-        if id then
-            local targetAsset = "http://www.roblox.com/asset/?id=" .. id
-            discoSky.SkyboxBk = targetAsset
-            discoSky.SkyboxDn = targetAsset
-            discoSky.SkyboxFt = targetAsset
-            discoSky.SkyboxLf = targetAsset
-            discoSky.SkyboxRt = targetAsset
-            discoSky.SkyboxUp = targetAsset
-            if states.disco then
-                discoSky.Parent = nil
-                discoSky.Parent = lighting
-            end
-        end
-    end
-end)
 
 local uiOpen = false
 dropUIText.MouseButton1Click:Connect(function()
@@ -955,7 +922,7 @@ rs.RenderStepped:Connect(function()
     if states.hcxxr then lighting.Ambient = Color3.fromRGB(255, 0, 0); lighting.OutdoorAmbient = Color3.fromRGB(150, 0, 0); for _, p in pairs(players:GetPlayers()) do if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then local root = p.Character.HumanoidRootPart; if not root:FindFirstChild("MeknoFire") then local f = Instance.new("Fire", root); f.Name = "MeknoFire"; f.Heat = 25; f.Size = 15; f.Color = Color3.fromRGB(255, 0, 0); f.SecondaryColor = Color3.fromRGB(100, 0, 0) end; for _, part in pairs(p.Character:GetDescendants()) do if part:IsA("BasePart") or part:IsA("Decal") then if part.Name == "HumanoidRootPart" then continue end; part.Transparency = 0 end end end end end
     if states.aimActive and not states.tpKill then local target = nil; local shortDistance = math.huge; for _, p in pairs(players:GetPlayers()) do if p ~= plr and p.Character and p.Character:FindFirstChild("Head") and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0 then if not plr.Team or p.Team ~= plr.Team or plr.Team == nil then local head = p.Character.Head; local currentDist = (head.Position - hrp.Position).Magnitude; if currentDist < shortDistance then target = head; shortDistance = currentDist end end end end; if target then cam.CFrame = CFrame.lookAt(cam.CFrame.Position, target.Position); local currentTool = char:FindFirstChildOfClass("Tool"); if currentTool then currentTool:Activate() end end end
     if states.esp then for _, p in pairs(players:GetPlayers()) do if p ~= plr and p.Character and not p.Character:FindFirstChild("MeknoHighlight") then Instance.new("Highlight", p.Character).Name = "MeknoHighlight" end end end
-    if states.title then local head = plr.Character and plr.Character:FindFirstChild("Head"); if head then local t = head:FindFirstChild("MeknoTitle"); if not t then t = Instance.new("BillboardGui"); t.Name = "MeknoTitle"; t.Size = UDim2.new(0, 200, 0, 50); t.AlwaysOnTop = true; t.Adornee = head; t.StudsOffset = Vector3.new(0, 3, 0); local txt = Instance.new("TextLabel", txt); txt.Size = UDim2.new(1, 0, 1, 0); txt.BackgroundTransparency = 1; txt.TextColor3 = Color3.fromRGB(255, 0, 0); txt.Font = Enum.Font.GothamBold; txt.TextSize = 18; txt.Text = "Meknoyu Here"; t.Parent = head; txt.Parent = t end end elseif not states.title then if plr.Character and plr.Character:FindFirstChild("Head") and plr.Character.Head:FindFirstChild("MeknoTitle") then plr.Character.Head.MeknoTitle:Destroy() end end
+    if states.title then local head = plr.Character and plr.Character:FindFirstChild("Head"); if head then local t = head:FindFirstChild("MeknoTitle"); if not t then t = Instance.new("BillboardGui"); t.Name = "MeknoTitle"; t.Size = UDim2.new(0, 200, 0, 50); t.AlwaysOnTop = true; t.Adornee = head; t.StudsOffset = Vector3.new(0, 3, 0); local txt = Instance.new("TextLabel", t); txt.Size = UDim2.new(1, 0, 1, 0); txt.BackgroundTransparency = 1; txt.TextColor3 = Color3.fromRGB(255, 0, 0); txt.Font = Enum.Font.GothamBold; txt.TextSize = 18; txt.Text = "Meknoyu Here"; t.Parent = head; txt.Parent = t end end elseif not states.title then if plr.Character and plr.Character:FindFirstChild("Head") and plr.Character.Head:FindFirstChild("MeknoTitle") then plr.Character.Head.MeknoTitle:Destroy() end end
     if states.noclip then for _, v in pairs(char:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end
     if states.speed and hum.MoveDirection.Magnitude > 0 then hrp.CFrame = hrp.CFrame + (hum.MoveDirection * 1.5) end
 end)
@@ -1193,9 +1160,8 @@ else
     local keyDisplayBox = Instance.new("TextBox")
     keyDisplayBox.Size = UDim2.new(0.85, 0, 0, 35)
     keyDisplayBox.Position = UDim2.new(0.075, 0, 0, 100)
-    keyDisplayBox.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    keyDisplayBox.Text = ""
-    keyDisplayBox.TextColor3 = Color3.fromRGB(0, 255, 0)
+    keyDisplayBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    keyDisplayBox.TextColor3 = Color3.fromRGB(0, 0, 0)
     keyDisplayBox.Font = Enum.Font.Code
     keyDisplayBox.TextSize = 12
     keyDisplayBox.ClearTextOnFocus = false
@@ -1216,7 +1182,7 @@ else
 
     copyActionBtn.MouseButton1Click:Connect(function()
         if setclipboard then
-            setclipboard(currentGeneratedKey)
+            setclipboard(keyDisplayBox.Text)
             copyActionBtn.Text = "Copied Success!"
             task.wait(1)
             copyActionBtn.Text = "Click to Copy Key"
