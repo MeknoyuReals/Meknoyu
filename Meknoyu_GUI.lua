@@ -574,6 +574,10 @@ createGameBtn("Murder Mystery 2 Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/mm2.lua"))()
 end)
 
+createGameBtn("Mine Per Click Script", pageGames, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Mineperclick.lua"))()
+end)
+
 createGameBtn("Pass or Explode Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/PassorExplode.lua"))()
 end)
@@ -590,8 +594,8 @@ createGameBtn("Sell Lemons Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Sell_lemons.lua"))()
 end)
 
-createGameBtn("Studio Lite Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Studiolite.lua"))()
+createGameBtn("Paint and Seek Script", pageGames, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Paintandseek.lua"))()
 end)
 
 createGameBtn("Grow a Garden 2 Script", pageGames, function()
