@@ -606,8 +606,8 @@ createGameBtn("Grow a Garden 2 Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/gag2.lua"))()
 end)
 
-createGameBtn("One Tap Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/onetap.lua"))()
+createGameBtn("Pistol Arena Script", pageGames, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/PistolArena.lua"))()
 end)
 
 -- // TAB SERVER CONTENT //
