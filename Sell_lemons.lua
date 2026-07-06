@@ -185,7 +185,7 @@ makeToggle("Teleport to Tree & Auto Click", "teleportTree", function(state)
             while flags.teleportTree do
                 for _, obj in pairs(workspace:GetDescendants()) do
                     if flags.teleportTree == false then break end
-                    if obj:IsA("BasePart") and obj.Name == "ClickPart" and obj:FindFirstChildOfClass("ClickDetector") then
+                    if obj:IsA("BasePart") and obj.Name == "ClickFruitPart" and obj:FindFirstChildOfClass("ClickDetector") then
                         local cd = obj:FindFirstChildOfClass("ClickDetector")
                         
                         hrp.CFrame = obj.CFrame * CFrame.new(0, 0, 3)
