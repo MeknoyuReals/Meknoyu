@@ -261,13 +261,9 @@ local runAutoSell = function()
     while states.AutoSell and _G.AutoSellBuffer do
         pcall(function()
             local args = {
-                buffer.fromstring("\156\000\019")
+                buffer.fromstring("\179\000\022")
             }
-            game:GetService("ReplicatedStorage")
-                :WaitForChild("SharedModules")
-                :WaitForChild("Packet")
-                :WaitForChild("RemoteEvent")
-                :FireServer(unpack(args))
+            game:GetService("ReplicatedStorage"):WaitForChild("SharedModules"):WaitForChild("Packet"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
         end)
         task.wait(0.5)
     end
