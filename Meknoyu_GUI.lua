@@ -228,8 +228,25 @@ rainbowConnection = rs.RenderStepped:Connect(function()
 end)
 
 local header = Instance.new("TextLabel", main)
-header.Size = UDim2.new(1, -110, 0, 40); header.Position = UDim2.new(0, 110, 0, 5)
+header.Size = UDim2.new(1, -110, 0, 25); header.Position = UDim2.new(0, 110, 0, 5)
 header.Text = "Meknoyu Gui | Hub"; header.BackgroundTransparency = 1; header.TextColor3 = Color3.new(1,1,1); header.Font = Enum.Font.GothamBold; header.TextSize = 18; header.TextXAlignment = Enum.TextXAlignment.Left
+
+-- LABEL KEY SYSTEM UNDER HEADER (FREE / OWNER CHECK)
+local keySystemLabel = Instance.new("TextLabel", main)
+keySystemLabel.Size = UDim2.new(1, -110, 0, 15)
+keySystemLabel.Position = UDim2.new(0, 110, 0, 26)
+keySystemLabel.BackgroundTransparency = 1
+keySystemLabel.Font = Enum.Font.GothamMedium
+keySystemLabel.TextSize = 11
+keySystemLabel.TextXAlignment = Enum.TextXAlignment.Left
+if plr.Name == "Meknoyu" then
+    keySystemLabel.Text = "KEY: OWNER"
+    keySystemLabel.TextColor3 = Color3.fromRGB(255, 0, 0) -- Merah untuk Owner
+else
+    keySystemLabel.Text = "KEY: FREE"
+    keySystemLabel.TextColor3 = Color3.fromRGB(0, 255, 128) -- Hijau untuk Free
+end
+
 local closeBtn = Instance.new("TextButton", main); closeBtn.Size = UDim2.new(0, 30, 0, 30); closeBtn.Position = UDim2.new(1, -35, 0, 7); closeBtn.Text = "X"; closeBtn.TextColor3 = Color3.new(1,0,0); closeBtn.BackgroundColor3 = Color3.fromRGB(40,40,40); Instance.new("UICorner", closeBtn)
 
 -- ==========================================
