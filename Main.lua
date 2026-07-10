@@ -986,7 +986,7 @@ end
 -- ==========================================================
 --    LOGIKA BYPASS OWNER & INITIALIZATION KEY SYSTEM
 -- ==========================================================
-if plr.Name == "Meknoyu" then
+if plr.Name == "xvlisrinze" then
     mainEngineLoad()
 else
     local keyVerified = false
