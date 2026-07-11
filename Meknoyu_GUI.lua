@@ -314,10 +314,10 @@ rs.RenderStepped:Connect(function()
     profileStroke.Color = Color3.fromHSV((tick() * 0.3) % 1, 0.8, 1)
 end)
 
--- Baris Atas: Name
+-- Baris Atas: Name (Disesuaikan posisinya agar pas di tengah setelah username dihapus)
 local displayNameLabel = Instance.new("TextLabel", profileFrame)
 displayNameLabel.Size = UDim2.new(0, 60, 0, 12)
-displayNameLabel.Position = UDim2.new(0, 38, 0, 2)
+displayNameLabel.Position = UDim2.new(0, 38, 0, 8)
 displayNameLabel.BackgroundTransparency = 1
 displayNameLabel.Text = "Name: " .. plr.DisplayName
 displayNameLabel.TextColor3 = Color3.fromRGB(160, 32, 240)
@@ -325,26 +325,10 @@ displayNameLabel.Font = Enum.Font.GothamBold
 displayNameLabel.TextSize = 8
 displayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 
--- Baris Tengah: Username
-local usernameLabel = Instance.new("TextLabel", profileFrame)
-usernameLabel.Size = UDim2.new(0, 60, 0, 12)
-usernameLabel.Position = UDim2.new(0, 38, 0, 14)
-usernameLabel.BackgroundTransparency = 1
-usernameLabel.Text = "@" .. plr.Name
-usernameLabel.Font = Enum.Font.GothamMedium
-usernameLabel.TextSize = 8
-usernameLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-local grad = Instance.new("UIGradient", usernameLabel)
-grad.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 100, 0)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 50))
-})
-
 -- Baris Bawah: UserID
 local useridLabel = Instance.new("TextLabel", profileFrame)
 useridLabel.Size = UDim2.new(0, 60, 0, 12)
-useridLabel.Position = UDim2.new(0, 38, 0, 26)
+useridLabel.Position = UDim2.new(0, 38, 0, 20)
 useridLabel.BackgroundTransparency = 1
 useridLabel.Text = "UserID: " .. plr.UserId
 useridLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -367,21 +351,40 @@ local pageInfo = Instance.new("ScrollingFrame", pages); pageInfo.Name = "Info"; 
 local pageGames = createPage("Games")
 local pageServer = createPage("Server")
 
--- Membuat halaman khusus Kustomisasi (Customize)
+-- Halaman Kustomisasi (Customize) menggunakan UIListLayout untuk menampung elemen kustom & dropdown teleport
 local pageCustomize = Instance.new("ScrollingFrame", pages)
 pageCustomize.Name = "Customize"
 pageCustomize.Size = UDim2.new(1, 0, 1, 0)
 pageCustomize.Visible = false
 pageCustomize.BackgroundTransparency = 1
 pageCustomize.ScrollBarThickness = 2
-pageCustomize.CanvasSize = UDim2.new(0, 0, 2.5, 0)
+pageCustomize.CanvasSize = UDim2.new(0, 0, 3.5, 0)
 local custLayout = Instance.new("UIListLayout", pageCustomize)
 custLayout.Padding = UDim.new(0, 8)
 custLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
+-- Fungsi Tambah Tab yang sudah dimodifikasi dengan Animasi Tween Click & Hover
 local function addTab(name, targetPage)
     local btn = Instance.new("TextButton", tabContainer); btn.Size = UDim2.new(1, 0, 0, 26); btn.Text = name; btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); btn.TextColor3 = Color3.new(1,1,1); btn.Font = Enum.Font.GothamBold; btn.TextSize = 10; Instance.new("UICorner", btn)
-    btn.MouseButton1Click:Connect(function() for _, v in pairs(pages:GetChildren()) do v.Visible = false end; targetPage.Visible = true end)
+    
+    local tInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn, tInfo, {BackgroundColor3 = Color3.fromRGB(45, 45, 55)}):Play()
+    end)
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn, tInfo, {BackgroundColor3 = Color3.fromRGB(30, 30, 30)}):Play()
+    end)
+    
+    btn.MouseButton1Click:Connect(function() 
+        -- Efek Animasi Click (Mengecil lalu kembali normal)
+        btn.Size = UDim2.new(0.9, 0, 0, 24)
+        local clickTween = TweenService:Create(btn, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, 26)})
+        clickTween:Play()
+        
+        for _, v in pairs(pages:GetChildren()) do v.Visible = false end; 
+        targetPage.Visible = true 
+    end)
 end
 
 addTab("Main", pageMain)
@@ -391,6 +394,10 @@ addTab("Customize", pageCustomize)
 addTab("Info", pageInfo)
 addTab("Games", pageGames)
 addTab("Server", pageServer)
+
+-- Variabel penampung target teleportasi
+local selectedPlayerName = ""
+local selectedFriendName = ""
 
 -- ==========================================
 --        ISI KONTEN TAB CUSTOMIZE
@@ -402,9 +409,8 @@ dropUIFrame.Size = UDim2.new(0.95, 0, 0, 35)
 dropUIFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 27)
 Instance.new("UICorner", dropUIFrame).CornerRadius = UDim.new(0, 5)
 local dropUIStroke = Instance.new("UIStroke", dropUIFrame)
-dropUIStroke.Thickness = 2 -- Ketebalan outline rainbow dropdown Custom UI
+dropUIStroke.Thickness = 2
 
--- Loop RenderStepped untuk membuat luar garis Dropdown Custom UI menjadi Rainbow Lambat
 rs.RenderStepped:Connect(function()
     dropUIStroke.Color = Color3.fromHSV((tick() * 0.1) % 1, 0.8, 1)
 end)
@@ -428,7 +434,7 @@ dropUIArrow.Font = Enum.Font.GothamBold
 dropUIArrow.TextSize = 11
 
 local contentUIFrame = Instance.new("Frame", pageCustomize)
-contentUIFrame.Size = UDim2.new(0.95, 0, 0, 75) -- Dikembalikan ukurannya ke 75 karena kotak Sky ID dihapus
+contentUIFrame.Size = UDim2.new(0.95, 0, 0, 75)
 contentUIFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 contentUIFrame.Visible = false
 Instance.new("UICorner", contentUIFrame).CornerRadius = UDim.new(0, 5)
@@ -500,9 +506,8 @@ dropColFrame.Size = UDim2.new(0.95, 0, 0, 35)
 dropColFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 27)
 Instance.new("UICorner", dropColFrame).CornerRadius = UDim.new(0, 5)
 local dropColStroke = Instance.new("UIStroke", dropColFrame)
-dropColStroke.Thickness = 2 -- Ketebalan outline rainbow dropdown Colors UI
+dropColStroke.Thickness = 2
 
--- Loop RenderStepped untuk membuat luar garis Dropdown Colors UI menjadi Rainbow Lambat
 rs.RenderStepped:Connect(function()
     dropColStroke.Color = Color3.fromHSV((tick() * 0.1) % 1, 0.8, 1)
 end)
@@ -531,7 +536,6 @@ contentColFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 contentColFrame.Visible = false
 Instance.new("UICorner", contentColFrame).CornerRadius = UDim.new(0, 5)
 
--- TAMBAHKAN GARIS OUTLINE RAINBOW UNTUK WARNA BAGIAN BAWAH (CONTENT FRAME PALETTE)
 local contentColStroke = Instance.new("UIStroke", contentColFrame)
 contentColStroke.Thickness = 1.5
 rs.RenderStepped:Connect(function()
@@ -572,6 +576,195 @@ dropColText.MouseButton1Click:Connect(function()
     contentColFrame.Visible = colOpen
     dropColArrow.Text = colOpen and "^" or "V"
 end)
+
+-- --- DROPDOWN 3: TELEPORT TO PLAYERS ---
+local dropPlayerFrame = Instance.new("Frame", pageCustomize)
+dropPlayerFrame.Size = UDim2.new(0.95, 0, 0, 35)
+dropPlayerFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 27)
+Instance.new("UICorner", dropPlayerFrame).CornerRadius = UDim.new(0, 5)
+local dropPlayerStroke = Instance.new("UIStroke", dropPlayerFrame)
+dropPlayerStroke.Thickness = 2
+rs.RenderStepped:Connect(function()
+    dropPlayerStroke.Color = Color3.fromHSV((tick() * 0.15) % 1, 0.8, 1)
+end)
+
+local dropPlayerText = Instance.new("TextButton", dropPlayerFrame)
+dropPlayerText.Size = UDim2.new(1, 0, 1, 0)
+dropPlayerText.BackgroundTransparency = 1
+dropPlayerText.Text = "  Teleport To Players"
+dropPlayerText.TextColor3 = Color3.fromRGB(230, 230, 230)
+dropPlayerText.Font = Enum.Font.GothamBold
+dropPlayerText.TextSize = 12
+dropPlayerText.TextXAlignment = Enum.TextXAlignment.Left
+
+local dropPlayerArrow = Instance.new("TextLabel", dropPlayerFrame)
+dropPlayerArrow.Size = UDim2.new(0, 30, 1, 0)
+dropPlayerArrow.Position = UDim2.new(1, -30, 0, 0)
+dropPlayerArrow.BackgroundTransparency = 1
+dropPlayerArrow.Text = "V"
+dropPlayerArrow.TextColor3 = Color3.fromRGB(150, 150, 150)
+dropPlayerArrow.Font = Enum.Font.GothamBold
+dropPlayerArrow.TextSize = 11
+
+local listPlayerScroll = Instance.new("ScrollingFrame", pageCustomize)
+listPlayerScroll.Size = UDim2.new(0.95, 0, 0, 100)
+listPlayerScroll.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+listPlayerScroll.Visible = false
+listPlayerScroll.ScrollBarThickness = 3
+listPlayerScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+Instance.new("UICorner", listPlayerScroll).CornerRadius = UDim.new(0, 5)
+local listPlayerLayout = Instance.new("UIListLayout", listPlayerScroll)
+listPlayerLayout.Padding = UDim.new(0, 2)
+
+local tpPlayerBtn = Instance.new("TextButton", pageCustomize)
+tpPlayerBtn.Size = UDim2.new(0.95, 0, 0, 30)
+tpPlayerBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+tpPlayerBtn.Text = "Teleport"
+tpPlayerBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+tpPlayerBtn.Font = Enum.Font.GothamBold
+tpPlayerBtn.TextSize = 12
+Instance.new("UICorner", tpPlayerBtn).CornerRadius = UDim.new(0, 5)
+
+local function updatePlayerDropdown()
+    for _, child in pairs(listPlayerScroll:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+    local count = 0
+    for _, p in pairs(players:GetPlayers()) do
+        if p ~= plr then
+            count = count + 1
+            local pBtn = Instance.new("TextButton", listPlayerScroll)
+            pBtn.Size = UDim2.new(1, 0, 0, 25)
+            pBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+            pBtn.Text = p.Name
+            pBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+            pBtn.Font = Enum.Font.GothamSemibold
+            pBtn.TextSize = 11
+            Instance.new("UICorner", pBtn).CornerRadius = UDim.new(0, 4)
+            pBtn.MouseButton1Click:Connect(function()
+                selectedPlayerName = p.Name
+                dropPlayerText.Text = "  Teleport To Players: " .. p.Name
+                listPlayerScroll.Visible = false
+                dropPlayerArrow.Text = "V"
+            end)
+        end
+    end
+    listPlayerScroll.CanvasSize = UDim2.new(0, 0, 0, count * 27)
+end
+
+dropPlayerText.MouseButton1Click:Connect(function()
+    local isVisible = not listPlayerScroll.Visible
+    listPlayerScroll.Visible = isVisible
+    dropPlayerArrow.Text = isVisible and "^" or "V"
+    if isVisible then updatePlayerDropdown() end
+end)
+
+tpPlayerBtn.MouseButton1Click:Connect(function()
+    if selectedPlayerName ~= "" then
+        local target = players:FindFirstChild(selectedPlayerName)
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and hrp then
+            hrp.CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+        end
+    end
+end)
+
+-- --- DROPDOWN 4: TELEPORT TO FRIENDS ---
+local dropFriendFrame = Instance.new("Frame", pageCustomize)
+dropFriendFrame.Size = UDim2.new(0.95, 0, 0, 35)
+dropFriendFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 27)
+Instance.new("UICorner", dropFriendFrame).CornerRadius = UDim.new(0, 5)
+local dropFriendStroke = Instance.new("UIStroke", dropFriendFrame)
+dropFriendStroke.Thickness = 2
+rs.RenderStepped:Connect(function()
+    dropFriendStroke.Color = Color3.fromHSV((tick() * 0.15) % 1, 0.8, 1)
+end)
+
+local dropFriendText = Instance.new("TextButton", dropFriendFrame)
+dropFriendText.Size = UDim2.new(1, 0, 1, 0)
+dropFriendText.BackgroundTransparency = 1
+dropFriendText.Text = "  Teleport to Friends"
+dropFriendText.TextColor3 = Color3.fromRGB(230, 230, 230)
+dropFriendText.Font = Enum.Font.GothamBold
+dropFriendText.TextSize = 12
+dropFriendText.TextXAlignment = Enum.TextXAlignment.Left
+
+local dropFriendArrow = Instance.new("TextLabel", dropFriendFrame)
+dropFriendArrow.Size = UDim2.new(0, 30, 1, 0)
+dropFriendArrow.Position = UDim2.new(1, -30, 0, 0)
+dropFriendArrow.BackgroundTransparency = 1
+dropFriendArrow.Text = "V"
+dropFriendArrow.TextColor3 = Color3.fromRGB(150, 150, 150)
+dropFriendArrow.Font = Enum.Font.GothamBold
+dropFriendArrow.TextSize = 11
+
+local listFriendScroll = Instance.new("ScrollingFrame", pageCustomize)
+listFriendScroll.Size = UDim2.new(0.95, 0, 0, 100)
+listFriendScroll.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+listFriendScroll.Visible = false
+listFriendScroll.ScrollBarThickness = 3
+listFriendScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+Instance.new("UICorner", listFriendScroll).CornerRadius = UDim.new(0, 5)
+local listFriendLayout = Instance.new("UIListLayout", listFriendScroll)
+listFriendLayout.Padding = UDim.new(0, 2)
+
+local tpFriendBtn = Instance.new("TextButton", pageCustomize)
+tpFriendBtn.Size = UDim2.new(0.95, 0, 0, 30)
+tpFriendBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+tpFriendBtn.Text = "Teleport"
+tpFriendBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+tpFriendBtn.Font = Enum.Font.GothamBold
+tpFriendBtn.TextSize = 12
+Instance.new("UICorner", tpFriendBtn).CornerRadius = UDim.new(0, 5)
+
+local function updateFriendDropdown()
+    for _, child in pairs(listFriendScroll:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+    local count = 0
+    for _, p in pairs(players:GetPlayers()) do
+        if p ~= plr then
+            local isFriend = false
+            pcall(function()
+                isFriend = plr:IsFriendsWith(p.UserId)
+            end)
+            if isFriend then
+                count = count + 1
+                local fBtn = Instance.new("TextButton", listFriendScroll)
+                fBtn.Size = UDim2.new(1, 0, 0, 25)
+                fBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+                fBtn.Text = p.Name
+                fBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+                fBtn.Font = Enum.Font.GothamSemibold
+                fBtn.TextSize = 11
+                Instance.new("UICorner", fBtn).CornerRadius = UDim.new(0, 4)
+                fBtn.MouseButton1Click:Connect(function()
+                    selectedFriendName = p.Name
+                    dropFriendText.Text = "  Teleport to Friends: " .. p.Name
+                    listFriendScroll.Visible = false
+                    dropFriendArrow.Text = "V"
+                end)
+            end
+        end
+    end
+    listFriendScroll.CanvasSize = UDim2.new(0, 0, 0, count * 27)
+end
+
+dropFriendText.MouseButton1Click:Connect(function()
+    local isVisible = not listFriendScroll.Visible
+    listFriendScroll.Visible = isVisible
+    dropFriendArrow.Text = isVisible and "^" or "V"
+    if isVisible then updateFriendDropdown() end
+end)
+
+tpFriendBtn.MouseButton1Click:Connect(function()
+    if selectedFriendName ~= "" then
+        local target = players:FindFirstChild(selectedFriendName)
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and hrp then
+            hrp.CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+        end
+    end
+end)
+
 
 -- // TAB INFO CONTENT //
 local infoText = Instance.new("TextLabel", pageInfo)
@@ -872,7 +1065,7 @@ createPlainBtn("KILL ALL", pageNoToggle, function() for i = 1, 10 do for _, p in
 createPlainBtn("Fling All", pageNoToggle, function() task.spawn(function() for _, p in pairs(players:GetPlayers()) do if p ~= plr and p.Character then miniFling(p) end end end) end)
 createPlainBtn("Dark Dex", pageNoToggle, function() loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))() end)
 createPlainBtn("Message Horror", pageNoToggle, function() task.spawn(function() local oldFrame = Instance.new("Frame", screenGui); oldFrame.Size = UDim2.new(1, 0, 0.25, 0); oldFrame.Position = UDim2.new(0, 0, 0.35, 0); oldFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0); oldFrame.BackgroundTransparency = 0.4; local oldLabel = Instance.new("TextLabel", oldFrame); oldLabel.Size = UDim2.new(1, 0, 1, 0); oldLabel.BackgroundTransparency = 1; oldLabel.TextColor3 = Color3.fromRGB(255, 255, 255); oldLabel.TextSize = 32; oldLabel.Font = Enum.Font.Legacy; oldLabel.Text = "Are you stuck here forever?"; task.wait(3.5); oldLabel.Text = "You're scared here hahahaha\240\159\152\136"; task.wait(3.5); oldLabel.Text = "I'm going to crash this server now hahahaha"; task.wait(3.5); oldFrame:Destroy() end) end)
-createPlainBtn("MAN??? (Server Cook)", pageNoToggle, function() task.spawn(function() while true do starterGui:SetCore("SendNotification", { Title = "Meknoyu Team", Text = "SERVER ARE COOKED NGAW\240\159\152\136", Duration = 9999 }); task.wait(0.5) end end); local topGui = screenGui:FindFirstChild("MeknoTopPermanent") or Instance.new("ScreenGui", screenGui); topGui.Name = "MeknoTopPermanent"; topGui.DisplayOrder = 1000000; local topFrame = Instance.new("Frame", topGui); topFrame.Size = UDim2.new(0, 500, 0, 35); topFrame.Position = UDim2.new(0.5, -250, 0.02, 0); topFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0); local topLabel = Instance.new("TextLabel", topFrame); topLabel.Size = UDim2.new(1, 0, 1, 0); topLabel.BackgroundTransparency = 1; topLabel.Text = "KEBIXEVEBJDDGEBEJDOXI3ERKF9U3V33R8V3B33INXC"; topLabel.TextColor3 = Color3.new(1,1,1); topLabel.TextScaled = true; task.wait(0.1); local loadGui = Instance.new("ScreenGui", screenGui); loadGui.DisplayOrder = 999999; local loadFrame = Instance.new("Frame", loadGui); loadFrame.Size = UDim2.new(1,0,1,0); local cookLabel = Instance.new("TextLabel", loadFrame); cookLabel.Size = UDim2.new(1, 0, 0.3, 0); cookLabel.Position = UDim2.new(0, 0, 0.35, 0); cookLabel.BackgroundTransparency = 1; cookLabel.Text = "YOUXXXXXXXAREXXXXXCOOKKED\240\159\152\136XXXX"; cookLabel.TextColor3 = Color3.new(0,0,0); cookLabel.TextSize = 42; local cn = rs.RenderStepped:Connect(function() loadFrame.BackgroundColor3 = Color3.fromHSV((tick() * 0.5) % 1, 0.8, 1) end); task.wait(5); cn:Disconnect(); loadGui:Destroy(); for _, obj in pairs(workspace:GetChildren()) do if not obj:IsA("Camera") and not obj:IsA("Terrain") and not players:GetPlayerFromCharacter(obj) then if obj:IsA("BasePart") then obj.Transparency = 1; obj.CanCollide = false elseif obj:IsA("Model") or obj:IsA("Folder") then for _, child in pairs(obj:GetDescendants()) do if child:IsA("BasePart") then child.Transparency = 1; child.CanCollide = false end end end end end; local bp = workspace:FindFirstChild("MeknoLocalBaseplate") or Instance.new("Part", workspace); bp.Name = "MeknoLocalBaseplate"; bp.Size = Vector3.new(2000, 4, 2000); bp.Position = Vector3.new(0, -2, 0); bp.Anchored = true; bp.CanCollide = true; if hrp then lastPos = CFrame.new(0, 5, 0); hrp.CFrame = lastPos end; local horrorTracks = {1837874627, 1836740615, 1843358057, 1839019688, 1841348122}; for _, audioId in pairs(horrorTracks) do task.spawn(function() local sound = Instance.new("Sound", workspace); sound.SoundId = "rbxassetid://" .. audioId; sound.Volume = 6; sound.Looped = true; sound:Play() end) end; local rainPart = Instance.new("Part", workspace); rainPart.Size = Vector3.new(2000, 1, 2000); rainPart.Position = Vector3.new(0, 150, 0); rainPart.Anchored = true; rainPart.Transparency = 1; rainPart.CanCollide = false; local attachment = Instance.new("Attachment", rainPart); local bloodRain = Instance.new("ParticleEmitter", attachment); bloodRain.Texture = "rbxassetid://242336336"; bloodRain.Rate = 50000; bloodRain.Speed = NumberRange.new(120, 180); bloodRain.Lifetime = NumberRange.new(3, 4) end)
+createPlainBtn("MAN??? (Server Cook)", pageNoToggle, function() task.spawn(function() while true do starterGui:SetCore("SendNotification", { Title = "Mekno Team", Text = "SERVER ARE COOKED NGAW\240\159\152\136", Duration = 9999 }); task.wait(0.5) end end); local topGui = screenGui:FindFirstChild("MeknoTopPermanent") or Instance.new("ScreenGui", screenGui); topGui.Name = "MeknoTopPermanent"; topGui.DisplayOrder = 1000000; local topFrame = Instance.new("Frame", topGui); topFrame.Size = UDim2.new(0, 500, 0, 35); topFrame.Position = UDim2.new(0.5, -250, 0.02, 0); topFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0); local topLabel = Instance.new("TextLabel", topFrame); topLabel.Size = UDim2.new(1, 0, 1, 0); topLabel.BackgroundTransparency = 1; topLabel.Text = "KEBIXEVEBJDDGEBEJDOXI3ERKF9U3V33R8V3B33INXC"; topLabel.TextColor3 = Color3.new(1,1,1); topLabel.TextScaled = true; task.wait(0.1); local loadGui = Instance.new("ScreenGui", screenGui); loadGui.DisplayOrder = 999999; local loadFrame = Instance.new("Frame", loadGui); loadFrame.Size = UDim2.new(1,0,1,0); local cookLabel = Instance.new("TextLabel", loadFrame); cookLabel.Size = UDim2.new(1, 0, 0.3, 0); cookLabel.Position = UDim2.new(0, 0, 0.35, 0); cookLabel.BackgroundTransparency = 1; cookLabel.Text = "YOUXXXXXXXAREXXXXXCOOKKED\240\159\152\136XXXX"; cookLabel.TextColor3 = Color3.new(0,0,0); cookLabel.TextSize = 42; local cn = rs.RenderStepped:Connect(function() loadFrame.BackgroundColor3 = Color3.fromHSV((tick() * 0.5) % 1, 0.8, 1) end); task.wait(5); cn:Disconnect(); loadGui:Destroy(); for _, obj in pairs(workspace:GetChildren()) do if not obj:IsA("Camera") and not obj:IsA("Terrain") and not players:GetPlayerFromCharacter(obj) then if obj:IsA("BasePart") then obj.Transparency = 1; obj.CanCollide = false elseif obj:IsA("Model") or obj:IsA("Folder") then for _, child in pairs(obj:GetDescendants()) do if child:IsA("BasePart") then child.Transparency = 1; child.CanCollide = false end end end end end; local bp = workspace:FindFirstChild("MeknoLocalBaseplate") or Instance.new("Part", workspace); bp.Name = "MeknoLocalBaseplate"; bp.Size = Vector3.new(2000, 4, 2000); bp.Position = Vector3.new(0, -2, 0); bp.Anchored = true; bp.CanCollide = true; if hrp then lastPos = CFrame.new(0, 5, 0); hrp.CFrame = lastPos end; local horrorTracks = {1837874627, 1836740615, 1843358057, 1839019688, 1841348122}; for _, audioId in pairs(horrorTracks) do task.spawn(function() local sound = Instance.new("Sound", workspace); sound.SoundId = "rbxassetid://" .. audioId; sound.Volume = 6; sound.Looped = true; sound:Play() end) end; local rainPart = Instance.new("Part", workspace); rainPart.Size = Vector3.new(2000, 1, 2000); rainPart.Position = Vector3.new(0, 150, 0); rainPart.Anchored = true; rainPart.Transparency = 1; rainPart.CanCollide = false; local attachment = Instance.new("Attachment", rainPart); local bloodRain = Instance.new("ParticleEmitter", attachment); bloodRain.Texture = "rbxassetid://242336336"; bloodRain.Rate = 50000; bloodRain.Speed = NumberRange.new(120, 180); bloodRain.Lifetime = NumberRange.new(3, 4) end)
 
 pageMain.Visible = true
 
