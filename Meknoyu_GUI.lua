@@ -229,7 +229,7 @@ end)
 
 local header = Instance.new("TextLabel", main)
 header.Size = UDim2.new(1, -110, 0, 25); header.Position = UDim2.new(0, 110, 0, 5)
-header.Text = "Meknoyu Gui | Hub"; header.BackgroundTransparency = 1; header.TextColor3 = Color3.new(1,1,1); header.Font = Enum.Font.GothamBold; header.TextSize = 18; header.TextXAlignment = Enum.TextXAlignment.Left
+header.Text = "MEKNOYU GUI | HUB"; header.BackgroundTransparency = 1; header.TextColor3 = Color3.new(1,1,1); header.Font = Enum.Font.GothamBold; header.TextSize = 18; header.TextXAlignment = Enum.TextXAlignment.Left
 
 -- LABEL KEY SYSTEM UNDER HEADER (FREE / OWNER CHECK)
 local keySystemLabel = Instance.new("TextLabel", main)
@@ -388,7 +388,7 @@ local function addTab(name, targetPage)
 end
 
 addTab("Main", pageMain)
-addTab("No Toggle", pageNoToggle)
+addTab("Visuals", pageNoToggle)
 addTab("Select Anti", pageSelectAnti)
 addTab("Customize", pageCustomize)
 addTab("Info", pageInfo)
@@ -943,7 +943,7 @@ createToggleBtn("Anti Ragdoll", "antirag", pageSelectAnti)
 createToggleBtn("Anti Afk", "antiafk", pageSelectAnti)
 createToggleBtn("Anti Robux", "antirobux", pageSelectAnti)
 
--- // TAB NO TOGGLE //
+-- // TAB VISUALS //
 local function createPlainBtn(name, parent, func)
     local b = Instance.new("TextButton", parent); b.Text = name; b.BackgroundColor3 = Color3.fromRGB(40, 40, 45); b.TextColor3 = Color3.new(1,1,1); b.Font = Enum.Font.GothamSemibold; b.TextSize = 10; Instance.new("UICorner", b)
     b.MouseButton1Click:Connect(func); return b
