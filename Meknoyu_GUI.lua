@@ -784,6 +784,10 @@ createGameBtn("Murder Mystery 2 Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/mm2.lua"))()
 end)
 
+createGameBtn("Quiet or Die Script", pageGames, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/QuietorDie.lua"))()
+end)
+
 createGameBtn("Chicken Farm Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Chickenfarm.lua"))()
 end)
