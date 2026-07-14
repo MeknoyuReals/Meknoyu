@@ -137,7 +137,7 @@ end)
 -- FUNGSI LOGIKA FITUR (QUIET OR DIE)
 -- ==========================================
 
--- [1] ESP LOGIC (Metode Part Adornment untuk melacak Tubuh & Gerakan Player Invisible secara real-time)
+-- [1] ANTI-LAG ESP LOGIC (Sistem Teroptimasi Tanpa Spam Instansiasi Objek Baru)
 local espFolder = Instance.new("Folder")
 espFolder.Name = "MeknoyuESPFolder"
 espFolder.Parent = game:GetService("CoreGui")
@@ -146,65 +146,65 @@ local function clearESP()
     espFolder:ClearAllChildren()
 end
 
--- Fungsi pembantu untuk menempelkan kotak visual ke setiap part tubuh target
 local function createPartAdornment(part, color)
     if not part:IsA("BasePart") or part.Name == "HumanoidRootPart" then return end
+    if part:FindFirstChild("MeknoPartESP") then return end -- Cegah duplikasi ganda
     
     local box = Instance.new("BoxHandleAdornment")
     box.Name = "MeknoPartESP"
-    box.Size = part.Size + Vector3.new(0.05, 0.05, 0.05) -- Sedikit lebih besar dari part asli agar jelas
+    box.Size = part.Size + Vector3.new(0.04, 0.04, 0.04)
     box.Color3 = color
-    box.Transparency = 0.4 -- Semi-transparan agar pergerakannya estetik
-    box.AlwaysOnTop = true -- Tembus dinding/obstacle
+    box.Transparency = 0.5 -- Transparansi diubah menjadi 0.5 sesuai request
+    box.AlwaysOnTop = true
     box.ZIndex = 5
     box.Adornee = part
     box.Parent = espFolder
 end
 
-RunService.RenderStepped:Connect(function()
-    if states.espPlayers then
-        pcall(function()
-            -- Bersihkan adornment lama yang kehilangan objek / adornee-nya tiap frame
-            for _, adorn in pairs(espFolder:GetChildren()) do
-                if not adorn.Adornee or not adorn.Adornee:IsDescendantOf(workspace) then
-                    adorn:Destroy()
+-- Dijalankan pada interval 1 detik sekali (Sangat ringan & anti-lag)
+task.spawn(function()
+    while true do
+        if states.espPlayers then
+            pcall(function()
+                -- Hapus part visual jika target aslinya sudah mati/hancur
+                for _, adorn in pairs(espFolder:GetChildren()) do
+                    if adorn:IsA("BoxHandleAdornment") and (not adorn.Adornee or not adorn.Adornee:IsDescendantOf(workspace)) then
+                        adorn:Destroy()
+                    end
                 end
-            end
 
-            -- Scan KillerFolder (Merah)
-            local KillerFolder = workspace:FindFirstChild("KillerFolder")
-            if KillerFolder then
-                for _, killer in pairs(KillerFolder:GetChildren()) do
-                    if killer:IsA("Model") and killer:FindFirstChild("HumanoidRootPart") then
-                        for _, bodyPart in pairs(killer:GetChildren()) do
-                            if bodyPart:IsA("BasePart") and not bodyPart:FindFirstChild("MeknoPartESP") then
+                -- Scan KillerFolder (Merah)
+                local KillerFolder = workspace:FindFirstChild("KillerFolder")
+                if KillerFolder then
+                    for _, killer in pairs(KillerFolder:GetChildren()) do
+                        if killer:IsA("Model") and killer:FindFirstChild("HumanoidRootPart") then
+                            for _, bodyPart in pairs(killer:GetChildren()) do
                                 createPartAdornment(bodyPart, Color3.fromRGB(255, 0, 0))
                             end
                         end
                     end
                 end
-            end
 
-            -- Scan PlayersFolder (Hijau)
-            local PlayersFolder = workspace:FindFirstChild("PlayersFolder")
-            if PlayersFolder then
-                for _, plr in pairs(PlayersFolder:GetChildren()) do
-                    if plr:IsA("Model") and plr.Name ~= LocalPlayer.Name and plr:FindFirstChild("HumanoidRootPart") then
-                        for _, bodyPart in pairs(plr:GetChildren()) do
-                            if bodyPart:IsA("BasePart") and not bodyPart:FindFirstChild("MeknoPartESP") then
+                -- Scan PlayersFolder (Hijau)
+                local PlayersFolder = workspace:FindFirstChild("PlayersFolder")
+                if PlayersFolder then
+                    for _, plr in pairs(PlayersFolder:GetChildren()) do
+                        if plr:IsA("Model") and plr.Name ~= LocalPlayer.Name and plr:FindFirstChild("HumanoidRootPart") then
+                            for _, bodyPart in pairs(plr:GetChildren()) do
                                 createPartAdornment(bodyPart, Color3.fromRGB(0, 255, 0))
                             end
                         end
                     end
                 end
-            end
-        end)
-    else
-        clearESP()
+            end)
+        else
+            clearESP()
+        end
+        task.wait(1) -- Interval pengecekan diatur agar CPU tetap adem
     end
 end)
 
--- [2] NOCLIP LOGIC (Menggantikan Anti Blink)
+-- [2] NOCLIP LOGIC
 RunService.Stepped:Connect(function()
     if states.noclip then
         pcall(function()
