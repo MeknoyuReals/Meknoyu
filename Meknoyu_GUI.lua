@@ -784,6 +784,10 @@ createGameBtn("Murder Mystery 2 Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/mm2.lua"))()
 end)
 
+createGameBtn("Murder Mystery 2 Script", pageGames, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/SurvivetheKiller.lua"))()
+end)
+
 createGameBtn("Spin a Soccer Card Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/SpinaSoccerCard.lua"))()
 end)
@@ -1476,4 +1480,4 @@ else
             confirmBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
         end
     end)
-end
+end 
