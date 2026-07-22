@@ -788,8 +788,8 @@ createGameBtn("Survive the Killer Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/SurvivetheKiller.lua"))()
 end)
 
-createGameBtn("Spin a Soccer Card Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/SpinaSoccerCard.lua"))()
+createGameBtn("Slime RNG Script", pageGames, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Slimerng.lua"))()
 end)
 
 createGameBtn("Quiet or Die Script", pageGames, function()
