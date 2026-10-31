@@ -1134,8 +1134,8 @@ createGameBtn("Prison Life Script", pageGames, function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Prisonlife.lua"))()
 end)
 
-createGameBtn("Troll Pinning Tower 2 Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Trollpinningtower2.lua"))()
+createGameBtn("Natural Disaster Survival Script", pageGames, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Naturaldisastersurvival.lua"))()
 end)
 
 createGameBtn("Sell Lemons Script", pageGames, function()
@@ -1331,11 +1331,57 @@ local function createPlainBtn(name, parent, func)
     return b
 end
 
+-- 1. SUB MENU GOD MODE (DENGAN TOMBOL X & LOGIKA KEBAL BARU)
 local godSubFrame = Instance.new("Frame", screenGui); godSubFrame.Size = UDim2.new(0, 150, 0, 100); godSubFrame.Position = UDim2.new(0.5, -75, 0.5, -50); godSubFrame.BackgroundColor3 = Color3.fromRGB(55, 55, 65); godSubFrame.BackgroundTransparency = 0; godSubFrame.Visible = false; godSubFrame.Active = true; godSubFrame.Draggable = true; Instance.new("UICorner", godSubFrame); applyBlackGreyGradient(godSubFrame)
 local godToggleBtn = Instance.new("TextButton", godSubFrame); godToggleBtn.Size = UDim2.new(0.8, 0, 0.4, 0); godToggleBtn.Position = UDim2.new(0.1, 0, 0.45, 0); godToggleBtn.Text = "God Mode : OFF"; godToggleBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75); godToggleBtn.BackgroundTransparency = 0; godToggleBtn.TextTransparency = 0; godToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255); godToggleBtn.TextStrokeTransparency = 0; godToggleBtn.TextStrokeColor3 = Color3.new(0, 0, 0); Instance.new("UICorner", godToggleBtn); applyBlackGreyGradient(godToggleBtn)
-local function GodModeSeatNoInvis(state) local c = game.Players.LocalPlayer.Character; if not c then return end for _, o in pairs(workspace:GetChildren()) do if o.Name == 'invischair' then pcall(function() o:Destroy() end) end end if state then local r = c:FindFirstChild("HumanoidRootPart"); if not r then return end task.wait(0.05); local scf = r.CFrame; local under = r.Position + Vector3.new(0, -100, 0); c:MoveTo(under); task.wait(0.1); local s = Instance.new("Seat", workspace); s.Anchored = true; s.CanCollide = false; s.Transparency = 1; s.Position = under; s.Name = "invischair"; local w = Instance.new("Weld", s); w.Part0 = s; w.Part1 = r; task.wait(); s.CFrame = scf; s.Anchored = false end end
-godToggleBtn.MouseButton1Click:Connect(function() states.god = not states.god; godToggleBtn.Text = "God Mode : " .. (states.god and "ON" or "OFF"); if states.god then GodModeSeatNoInvis(true); godConnection = rs.Heartbeat:Connect(function() if char and hum and hrp then hum.MaxHealth = math.huge; hum.Health = math.huge; hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false) end end) else if godConnection then godConnection:Disconnect() end; GodModeSeatNoInvis(false); if hum then hum.MaxHealth = 100; hum.Health = 100; hum:SetStateEnabled(Enum.HumanoidStateType.Dead, true) end end end)
 
+local godCloseBtn = Instance.new("TextButton", godSubFrame)
+godCloseBtn.Size = UDim2.new(0, 24, 0, 24)
+godCloseBtn.Position = UDim2.new(1, -28, 0, 4)
+godCloseBtn.Text = "X"
+godCloseBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
+godCloseBtn.Font = Enum.Font.GothamBold
+godCloseBtn.TextSize = 12
+godCloseBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
+Instance.new("UICorner", godCloseBtn).CornerRadius = UDim.new(0, 4)
+applyBlackGreyGradient(godCloseBtn)
+godCloseBtn.MouseButton1Click:Connect(function()
+    godSubFrame.Visible = false
+end)
+
+godToggleBtn.MouseButton1Click:Connect(function() 
+    states.god = not states.god
+    godToggleBtn.Text = "God Mode : " .. (states.god and "ON" or "OFF")
+    if states.god then
+        godConnection = rs.Heartbeat:Connect(function()
+            pcall(function()
+                if char and hum and hrp then
+                    hum.MaxHealth = math.huge
+                    hum.Health = math.huge
+                    -- Cegah mati, jatuh ke void, dan reset state terkena hit/ragdoll
+                    hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+                    hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+                    hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+                    if hrp.Position.Y < -50 then
+                        hrp.CFrame = CFrame.new(hrp.Position.X, 50, hrp.Position.Z)
+                        hrp.Velocity = Vector3.new(0, 0, 0)
+                    end
+                end
+            end)
+        end)
+    else
+        if godConnection then godConnection:Disconnect() end
+        if hum then
+            hum.MaxHealth = 100
+            hum.Health = 100
+            hum:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
+            hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
+            hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true)
+        end
+    end 
+end)
+
+-- 2. SUB MENU INVISIBLE (DENGAN TOMBOL X)
 local invisSubFrame = Instance.new("Frame", screenGui); invisSubFrame.Size = UDim2.new(0, 150, 0, 100); invisSubFrame.Position = UDim2.new(0.5, -75, 0.5, -50); invisSubFrame.BackgroundColor3 = Color3.fromRGB(55, 55, 65); invisSubFrame.BackgroundTransparency = 0; invisSubFrame.Visible = false; invisSubFrame.Active = true; invisSubFrame.Draggable = true; Instance.new("UICorner", invisSubFrame); applyBlackGreyGradient(invisSubFrame)
 local invisToggleBtn = Instance.new("TextButton", invisSubFrame); invisToggleBtn.Size = UDim2.new(0.8, 0, 0.4, 0); invisToggleBtn.Position = UDim2.new(0.1, 0, 0.45, 0); invisToggleBtn.Text = "Invisible : OFF"; invisToggleBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75); invisToggleBtn.BackgroundTransparency = 0; invisToggleBtn.TextTransparency = 0; invisToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255); invisToggleBtn.TextStrokeTransparency = 0; invisToggleBtn.TextStrokeColor3 = Color3.new(0, 0, 0); Instance.new("UICorner", invisToggleBtn); applyBlackGreyGradient(invisToggleBtn)
 
@@ -1392,9 +1438,25 @@ end
 
 invisToggleBtn.MouseButton1Click:Connect(function() states.invis = not states.invis; invisToggleBtn.Text = "Invisible : " .. (states.invis and "ON" or "OFF"); setInvisState(states.invis) end)
 
+-- 3. SUB MENU EXECUTOR PROJECT (DENGAN TOMBOL X)
 local execMainFrame = Instance.new("Frame", screenGui); execMainFrame.Size = UDim2.new(0, 300, 0, 220); execMainFrame.Position = UDim2.new(0.5, -150, 0.5, -110); execMainFrame.BackgroundColor3 = Color3.fromRGB(55, 55, 65); execMainFrame.BackgroundTransparency = 0; execMainFrame.Visible = false; execMainFrame.Active = true; execMainFrame.Draggable = true; Instance.new("UICorner", execMainFrame); applyBlackGreyGradient(execMainFrame)
 local execTextBox = Instance.new("TextBox", execMainFrame); execTextBox.Size = UDim2.new(1, -20, 0, 130); execTextBox.Position = UDim2.new(0, 10, 0, 40); execTextBox.BackgroundColor3 = Color3.fromRGB(20, 20, 25); execTextBox.TextColor3 = Color3.fromRGB(255, 255, 255); execTextBox.ClearTextOnFocus = false; execTextBox.MultiLine = true; execTextBox.Font = Enum.Font.Code; execTextBox.TextSize = 10; Instance.new("UICorner", execTextBox)
 local executeSubBtn = Instance.new("TextButton", execMainFrame); executeSubBtn.Size = UDim2.new(0, 85, 0, 35); executeSubBtn.Position = UDim2.new(0, 10, 0, 175); executeSubBtn.Text = "Execute"; executeSubBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75); executeSubBtn.BackgroundTransparency = 0; executeSubBtn.TextTransparency = 0; executeSubBtn.TextColor3 = Color3.fromRGB(255, 255, 255); executeSubBtn.TextStrokeTransparency = 0; executeSubBtn.TextStrokeColor3 = Color3.new(0, 0, 0); Instance.new("UICorner", executeSubBtn); applyBlackGreyGradient(executeSubBtn)
+
+local execCloseBtn = Instance.new("TextButton", execMainFrame)
+execCloseBtn.Size = UDim2.new(0, 24, 0, 24)
+execCloseBtn.Position = UDim2.new(1, -28, 0, 6)
+execCloseBtn.Text = "X"
+execCloseBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
+execCloseBtn.Font = Enum.Font.GothamBold
+execCloseBtn.TextSize = 12
+execCloseBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
+Instance.new("UICorner", execCloseBtn).CornerRadius = UDim.new(0, 4)
+applyBlackGreyGradient(execCloseBtn)
+execCloseBtn.MouseButton1Click:Connect(function()
+    execMainFrame.Visible = false
+end)
+
 executeSubBtn.MouseButton1Click:Connect(function() if execTextBox.Text ~= "" then pcall(function() local func = loadstring(execTextBox.Text); if func then func() end end) end end)
 
 local function miniFling(playerToFling)
