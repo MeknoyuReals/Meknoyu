@@ -17,12 +17,12 @@ local mouse = plr:GetMouse()
 -- // CONFIG DISCORD WEBHOOK //
 local DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL_HERE"
 
--- // FUNGSI PEMBUAT GRADIENT //
+-- // FUNGSI PEMBUAT GRADIENT (DIBUAT LEBIH TERANG AGAR JELAS) //
 local function applyBlackGreyGradient(instance)
     local uiGradient = Instance.new("UIGradient")
     uiGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(65, 65, 70)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 35))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(95, 95, 105)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(55, 55, 65))
     })
     uiGradient.Parent = instance
     return uiGradient
@@ -51,7 +51,7 @@ local function customNotify(title, text, duration)
     duration = duration or 4
     local frame = Instance.new("Frame", notifContainer)
     frame.Size = UDim2.new(0, 240, 0, 60)
-    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    frame.BackgroundColor3 = Color3.fromRGB(55, 55, 65)
     frame.BackgroundTransparency = 0.1
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
     applyBlackGreyGradient(frame)
@@ -74,7 +74,7 @@ local function customNotify(title, text, duration)
     bLabel.Size = UDim2.new(1, -15, 0, 30)
     bLabel.Position = UDim2.new(0, 10, 0, 25)
     bLabel.Text = text
-    bLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    bLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
     bLabel.Font = Enum.Font.Gotham
     bLabel.TextSize = 10
     bLabel.TextWrapped = true
@@ -286,9 +286,9 @@ if plr.Character then setupChar(plr.Character) end
 plr.CharacterAdded:Connect(setupChar)
 
 --// TELEPORT BACK GUI //--
-local tpBackGui = Instance.new("Frame", screenGui); tpBackGui.Size = UDim2.new(0, 160, 0, 100); tpBackGui.Position = UDim2.new(0.8, 0, 0.5, 0); tpBackGui.BackgroundColor3 = Color3.fromRGB(255,255,255); tpBackGui.BackgroundTransparency = 0; tpBackGui.Visible = false; tpBackGui.Active = true; tpBackGui.Draggable = true; Instance.new("UICorner", tpBackGui); applyBlackGreyGradient(tpBackGui)
-local saveBtn = Instance.new("TextButton", tpBackGui); saveBtn.Size = UDim2.new(0, 160 * 0.9, 0, 100 * 0.4); saveBtn.Position = UDim2.new(0.05, 0, 0.05, 0); saveBtn.Text = "Save Pos : OFF"; saveBtn.BackgroundColor3 = Color3.fromRGB(255,255,255); saveBtn.BackgroundTransparency = 0; saveBtn.TextTransparency = 0; saveBtn.TextColor3 = Color3.fromRGB(255,255,255); saveBtn.TextStrokeTransparency = 0; saveBtn.TextStrokeColor3 = Color3.new(0,0,0); Instance.new("UICorner", saveBtn); applyBlackGreyGradient(saveBtn)
-local clickTpBtn = Instance.new("TextButton", tpBackGui); clickTpBtn.Size = UDim2.new(0, 160 * 0.9, 0, 100 * 0.4); clickTpBtn.Position = UDim2.new(0.05, 0, 0.55, 0); clickTpBtn.Text = "Click TP Back"; clickTpBtn.BackgroundColor3 = Color3.fromRGB(255,255,255); clickTpBtn.BackgroundTransparency = 0; clickTpBtn.TextTransparency = 0; clickTpBtn.TextColor3 = Color3.fromRGB(255,255,255); clickTpBtn.TextStrokeTransparency = 0; clickTpBtn.TextStrokeColor3 = Color3.new(0,0,0); Instance.new("UICorner", clickTpBtn); applyBlackGreyGradient(clickTpBtn)
+local tpBackGui = Instance.new("Frame", screenGui); tpBackGui.Size = UDim2.new(0, 160, 0, 100); tpBackGui.Position = UDim2.new(0.8, 0, 0.5, 0); tpBackGui.BackgroundColor3 = Color3.fromRGB(55,55,65); tpBackGui.BackgroundTransparency = 0; tpBackGui.Visible = false; tpBackGui.Active = true; tpBackGui.Draggable = true; Instance.new("UICorner", tpBackGui); applyBlackGreyGradient(tpBackGui)
+local saveBtn = Instance.new("TextButton", tpBackGui); saveBtn.Size = UDim2.new(0, 160 * 0.9, 0, 100 * 0.4); saveBtn.Position = UDim2.new(0.05, 0, 0.05, 0); saveBtn.Text = "Save Pos : OFF"; saveBtn.BackgroundColor3 = Color3.fromRGB(55,55,65); saveBtn.BackgroundTransparency = 0; saveBtn.TextTransparency = 0; saveBtn.TextColor3 = Color3.fromRGB(255,255,255); saveBtn.TextStrokeTransparency = 0; saveBtn.TextStrokeColor3 = Color3.new(0,0,0); Instance.new("UICorner", saveBtn); applyBlackGreyGradient(saveBtn)
+local clickTpBtn = Instance.new("TextButton", tpBackGui); clickTpBtn.Size = UDim2.new(0, 160 * 0.9, 0, 100 * 0.4); clickTpBtn.Position = UDim2.new(0.05, 0, 0.55, 0); clickTpBtn.Text = "Click TP Back"; clickTpBtn.BackgroundColor3 = Color3.fromRGB(55,55,65); clickTpBtn.BackgroundTransparency = 0; clickTpBtn.TextTransparency = 0; clickTpBtn.TextColor3 = Color3.fromRGB(255,255,255); clickTpBtn.TextStrokeTransparency = 0; clickTpBtn.TextStrokeColor3 = Color3.new(0,0,0); Instance.new("UICorner", clickTpBtn); applyBlackGreyGradient(clickTpBtn)
 saveBtn.MouseButton1Click:Connect(function() states.savepos = not states.savepos; saveBtn.Text = "Save Pos : " .. (states.savepos and "ON" or "OFF"); if states.savepos and hrp then savedPos = hrp.CFrame; lastPos = savedPos end end)
 clickTpBtn.MouseButton1Click:Connect(function() if savedPos and hrp then savedPos = savedPos; wait(0.1); hrp.CFrame = savedPos end end)
 
@@ -296,7 +296,7 @@ clickTpBtn.MouseButton1Click:Connect(function() if savedPos and hrp then savedPo
 local main = Instance.new("Frame", screenGui)
 main.Size = UDim2.new(0, 510, 0, 300)
 main.Position = UDim2.new(0.5, -255, 0.5, -150)
-main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+main.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
 main.BackgroundTransparency = 0
 main.Active = true; main.Draggable = true; Instance.new("UICorner", main)
 applyBlackGreyGradient(main)
@@ -335,7 +335,7 @@ local miniBtn = Instance.new("TextButton", screenGui)
 miniBtn.Size = UDim2.new(0, 120, 0, 32)
 miniBtn.Position = UDim2.new(0.5, -60, 0.12, 0)
 miniBtn.Text = "Meknoyu GUI"
-miniBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
+miniBtn.BackgroundColor3 = Color3.fromRGB(55,55,65)
 miniBtn.BackgroundTransparency = 0
 miniBtn.TextTransparency = 0
 miniBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -412,7 +412,7 @@ else
     keySystemLabel.TextColor3 = Color3.fromRGB(0, 255, 128)
 end
 
-local closeBtn = Instance.new("TextButton", main); closeBtn.Size = UDim2.new(0, 30, 0, 30); closeBtn.Position = UDim2.new(1, -35, 0, 7); closeBtn.Text = "X"; closeBtn.TextTransparency = 0; closeBtn.TextColor3 = Color3.new(1,0,0); closeBtn.TextStrokeTransparency = 0; closeBtn.TextStrokeColor3 = Color3.new(0,0,0); closeBtn.BackgroundColor3 = Color3.fromRGB(255,255,255); closeBtn.BackgroundTransparency = 0; Instance.new("UICorner", closeBtn); applyBlackGreyGradient(closeBtn)
+local closeBtn = Instance.new("TextButton", main); closeBtn.Size = UDim2.new(0, 30, 0, 30); closeBtn.Position = UDim2.new(1, -35, 0, 7); closeBtn.Text = "X"; closeBtn.TextTransparency = 0; closeBtn.TextColor3 = Color3.new(1,0,0); closeBtn.TextStrokeTransparency = 0; closeBtn.TextStrokeColor3 = Color3.new(0,0,0); closeBtn.BackgroundColor3 = Color3.fromRGB(55,55,65); closeBtn.BackgroundTransparency = 0; Instance.new("UICorner", closeBtn); applyBlackGreyGradient(closeBtn)
 
 -- ==========================================
 --        FITUR KUSTOM KEYBIND E (DI ATAS KANAN)
@@ -422,7 +422,7 @@ local bindBox = Instance.new("TextBox", main)
 bindBox.Size = UDim2.new(0, 35, 0, 30)
 bindBox.Position = UDim2.new(1, -75, 0, 7)
 bindBox.Text = "E"
-bindBox.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+bindBox.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
 bindBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 bindBox.Font = Enum.Font.GothamBold
 bindBox.TextSize = 12
@@ -506,7 +506,7 @@ profileFrame.BackgroundTransparency = 1
 local profilePic = Instance.new("ImageLabel", profileFrame)
 profilePic.Size = UDim2.new(0, 32, 0, 32)
 profilePic.Position = UDim2.new(0, 2, 0, 2)
-profilePic.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+profilePic.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
 profilePic.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. plr.UserId .. "&width=150&height=150&format=png"
 Instance.new("UICorner", profilePic).CornerRadius = UDim.new(1, 0)
 
@@ -523,7 +523,7 @@ displayNameLabel.Position = UDim2.new(0, 38, 0, 2)
 displayNameLabel.BackgroundTransparency = 1
 displayNameLabel.TextTransparency = 0
 displayNameLabel.Text = "Name: " .. plr.DisplayName
-displayNameLabel.TextColor3 = Color3.fromRGB(160, 32, 240)
+displayNameLabel.TextColor3 = Color3.fromRGB(180, 80, 255)
 displayNameLabel.Font = Enum.Font.GothamBold
 displayNameLabel.TextSize = 8
 displayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -534,7 +534,7 @@ useridLabel.Position = UDim2.new(0, 38, 0, 14)
 useridLabel.BackgroundTransparency = 1
 useridLabel.TextTransparency = 0
 useridLabel.Text = "UserID: " .. plr.UserId
-useridLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+useridLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
 useridLabel.Font = Enum.Font.GothamMedium
 useridLabel.TextSize = 7
 useridLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -543,7 +543,7 @@ useridLabel.TextXAlignment = Enum.TextXAlignment.Left
 local mapIcon = Instance.new("ImageLabel", profileFrame)
 mapIcon.Size = UDim2.new(0, 22, 0, 22)
 mapIcon.Position = UDim2.new(0, 2, 0, 38)
-mapIcon.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+mapIcon.BackgroundColor3 = Color3.fromRGB(55, 55, 65)
 Instance.new("UICorner", mapIcon).CornerRadius = UDim.new(0, 4)
 
 local mapNameLabel = Instance.new("TextLabel", profileFrame)
@@ -604,7 +604,7 @@ local function addTab(name, targetPage)
     local btn = Instance.new("TextButton", tabContainer)
     btn.Size = UDim2.new(1, 0, 0, 26)
     btn.Text = name
-    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    btn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
     btn.BackgroundTransparency = 0
     btn.TextTransparency = 0
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -653,7 +653,7 @@ local selectedFriendName = ""
 -- --- DROPDOWN 1: CUSTOM UI ---
 local dropUIFrame = Instance.new("Frame", pageCustomize)
 dropUIFrame.Size = UDim2.new(0.95, 0, 0, 35)
-dropUIFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+dropUIFrame.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
 dropUIFrame.BackgroundTransparency = 0
 Instance.new("UICorner", dropUIFrame).CornerRadius = UDim.new(0, 5)
 applyBlackGreyGradient(dropUIFrame)
@@ -690,7 +690,7 @@ dropUIArrow.TextSize = 11
 
 local contentUIFrame = Instance.new("Frame", pageCustomize)
 contentUIFrame.Size = UDim2.new(0.95, 0, 0, 75)
-contentUIFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+contentUIFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
 contentUIFrame.BackgroundTransparency = 0
 contentUIFrame.Visible = false
 Instance.new("UICorner", contentUIFrame).CornerRadius = UDim.new(0, 5)
@@ -711,7 +711,7 @@ sliderTitle.TextXAlignment = Enum.TextXAlignment.Left
 local sliderTrack = Instance.new("Frame", contentUIFrame)
 sliderTrack.Size = UDim2.new(0.85, 0, 0, 5)
 sliderTrack.Position = UDim2.new(0.075, 0, 0, 32)
-sliderTrack.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
+sliderTrack.BackgroundColor3 = Color3.fromRGB(90, 90, 100)
 sliderTrack.BorderSizePixel = 0
 
 local sliderThumb = Instance.new("TextButton", sliderTrack)
@@ -767,7 +767,7 @@ rs.RenderStepped:Connect(updateSlider)
 -- --- DROPDOWN 2: COLORS UI ---
 local dropColFrame = Instance.new("Frame", pageCustomize)
 dropColFrame.Size = UDim2.new(0.95, 0, 0, 35)
-dropColFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+dropColFrame.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
 dropColFrame.BackgroundTransparency = 0
 Instance.new("UICorner", dropColFrame).CornerRadius = UDim.new(0, 5)
 applyBlackGreyGradient(dropColFrame)
@@ -804,7 +804,7 @@ dropColArrow.TextSize = 11
 
 local contentColFrame = Instance.new("Frame", pageCustomize)
 contentColFrame.Size = UDim2.new(0.95, 0, 0, 75)
-contentColFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+contentColFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
 contentColFrame.BackgroundTransparency = 0
 contentColFrame.Visible = false
 Instance.new("UICorner", contentColFrame).CornerRadius = UDim.new(0, 5)
@@ -855,7 +855,7 @@ end)
 -- --- DROPDOWN 3: TELEPORT TO PLAYERS ---
 local dropPlayerFrame = Instance.new("Frame", pageCustomize)
 dropPlayerFrame.Size = UDim2.new(0.95, 0, 0, 35)
-dropPlayerFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+dropPlayerFrame.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
 dropPlayerFrame.BackgroundTransparency = 0
 Instance.new("UICorner", dropPlayerFrame).CornerRadius = UDim.new(0, 5)
 applyBlackGreyGradient(dropPlayerFrame)
@@ -891,7 +891,7 @@ dropPlayerArrow.TextSize = 11
 
 local listPlayerScroll = Instance.new("ScrollingFrame", pageCustomize)
 listPlayerScroll.Size = UDim2.new(0.95, 0, 0, 100)
-listPlayerScroll.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+listPlayerScroll.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
 listPlayerScroll.BackgroundTransparency = 0
 listPlayerScroll.Visible = false
 listPlayerScroll.ScrollBarThickness = 3
@@ -902,7 +902,7 @@ listPlayerLayout.Padding = UDim.new(0, 2)
 
 local tpPlayerBtn = Instance.new("TextButton", pageCustomize)
 tpPlayerBtn.Size = UDim2.new(0.95, 0, 0, 30)
-tpPlayerBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+tpPlayerBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
 tpPlayerBtn.BackgroundTransparency = 0
 tpPlayerBtn.TextTransparency = 0
 tpPlayerBtn.Text = "Teleport"
@@ -924,7 +924,7 @@ local function updatePlayerDropdown()
             count = count + 1
             local pBtn = Instance.new("TextButton", listPlayerScroll)
             pBtn.Size = UDim2.new(1, 0, 0, 25)
-            pBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+            pBtn.BackgroundColor3 = Color3.fromRGB(75, 75, 85)
             pBtn.BackgroundTransparency = 0
             pBtn.TextTransparency = 0
             pBtn.Text = p.Name
@@ -964,7 +964,7 @@ end)
 -- --- DROPDOWN 4: TELEPORT TO FRIENDS ---
 local dropFriendFrame = Instance.new("Frame", pageCustomize)
 dropFriendFrame.Size = UDim2.new(0.95, 0, 0, 35)
-dropFriendFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+dropFriendFrame.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
 dropFriendFrame.BackgroundTransparency = 0
 Instance.new("UICorner", dropFriendFrame).CornerRadius = UDim.new(0, 5)
 applyBlackGreyGradient(dropFriendFrame)
@@ -1000,7 +1000,7 @@ dropFriendArrow.TextSize = 11
 
 local listFriendScroll = Instance.new("ScrollingFrame", pageCustomize)
 listFriendScroll.Size = UDim2.new(0.95, 0, 0, 100)
-listFriendScroll.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+listFriendScroll.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
 listFriendScroll.BackgroundTransparency = 0
 listFriendScroll.Visible = false
 listFriendScroll.ScrollBarThickness = 3
@@ -1011,7 +1011,7 @@ listFriendLayout.Padding = UDim.new(0, 2)
 
 local tpFriendBtn = Instance.new("TextButton", pageCustomize)
 tpFriendBtn.Size = UDim2.new(0.95, 0, 0, 30)
-tpFriendBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+tpFriendBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
 tpFriendBtn.BackgroundTransparency = 0
 tpFriendBtn.TextTransparency = 0
 tpFriendBtn.Text = "Teleport"
@@ -1038,7 +1038,7 @@ local function updateFriendDropdown()
                 count = count + 1
                 local fBtn = Instance.new("TextButton", listFriendScroll)
                 fBtn.Size = UDim2.new(1, 0, 0, 25)
-                fBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+                fBtn.BackgroundColor3 = Color3.fromRGB(75, 75, 85)
                 fBtn.BackgroundTransparency = 0
                 fBtn.TextTransparency = 0
                 fBtn.Text = p.Name
@@ -1088,7 +1088,7 @@ infoText.Text = "This script is strictly guarded and secure. There is no account
 local function createGameBtn(name, parent, func)
     local b = Instance.new("TextButton", parent)
     b.Text = name
-    b.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    b.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
     b.BackgroundTransparency = 0
     b.TextTransparency = 0
     b.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1228,7 +1228,7 @@ end)
 local function createToggleBtn(name, key, parent)
     local b = Instance.new("TextButton", parent)
     b.Text = name .. " : OFF"
-    b.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    b.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
     b.BackgroundTransparency = 0
     b.TextTransparency = 0
     b.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1316,7 +1316,7 @@ createToggleBtn("Anti Lag", "antilag", pageSelectAnti)
 local function createPlainBtn(name, parent, func)
     local b = Instance.new("TextButton", parent)
     b.Text = name
-    b.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    b.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
     b.BackgroundTransparency = 0
     b.TextTransparency = 0
     b.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1331,13 +1331,13 @@ local function createPlainBtn(name, parent, func)
     return b
 end
 
-local godSubFrame = Instance.new("Frame", screenGui); godSubFrame.Size = UDim2.new(0, 150, 0, 100); godSubFrame.Position = UDim2.new(0.5, -75, 0.5, -50); godSubFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255); godSubFrame.BackgroundTransparency = 0; godSubFrame.Visible = false; godSubFrame.Active = true; godSubFrame.Draggable = true; Instance.new("UICorner", godSubFrame); applyBlackGreyGradient(godSubFrame)
-local godToggleBtn = Instance.new("TextButton", godSubFrame); godToggleBtn.Size = UDim2.new(0.8, 0, 0.4, 0); godToggleBtn.Position = UDim2.new(0.1, 0, 0.45, 0); godToggleBtn.Text = "God Mode : OFF"; godToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255); godToggleBtn.BackgroundTransparency = 0; godToggleBtn.TextTransparency = 0; godToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255); godToggleBtn.TextStrokeTransparency = 0; godToggleBtn.TextStrokeColor3 = Color3.new(0, 0, 0); Instance.new("UICorner", godToggleBtn); applyBlackGreyGradient(godToggleBtn)
+local godSubFrame = Instance.new("Frame", screenGui); godSubFrame.Size = UDim2.new(0, 150, 0, 100); godSubFrame.Position = UDim2.new(0.5, -75, 0.5, -50); godSubFrame.BackgroundColor3 = Color3.fromRGB(55, 55, 65); godSubFrame.BackgroundTransparency = 0; godSubFrame.Visible = false; godSubFrame.Active = true; godSubFrame.Draggable = true; Instance.new("UICorner", godSubFrame); applyBlackGreyGradient(godSubFrame)
+local godToggleBtn = Instance.new("TextButton", godSubFrame); godToggleBtn.Size = UDim2.new(0.8, 0, 0.4, 0); godToggleBtn.Position = UDim2.new(0.1, 0, 0.45, 0); godToggleBtn.Text = "God Mode : OFF"; godToggleBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75); godToggleBtn.BackgroundTransparency = 0; godToggleBtn.TextTransparency = 0; godToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255); godToggleBtn.TextStrokeTransparency = 0; godToggleBtn.TextStrokeColor3 = Color3.new(0, 0, 0); Instance.new("UICorner", godToggleBtn); applyBlackGreyGradient(godToggleBtn)
 local function GodModeSeatNoInvis(state) local c = game.Players.LocalPlayer.Character; if not c then return end for _, o in pairs(workspace:GetChildren()) do if o.Name == 'invischair' then pcall(function() o:Destroy() end) end end if state then local r = c:FindFirstChild("HumanoidRootPart"); if not r then return end task.wait(0.05); local scf = r.CFrame; local under = r.Position + Vector3.new(0, -100, 0); c:MoveTo(under); task.wait(0.1); local s = Instance.new("Seat", workspace); s.Anchored = true; s.CanCollide = false; s.Transparency = 1; s.Position = under; s.Name = "invischair"; local w = Instance.new("Weld", s); w.Part0 = s; w.Part1 = r; task.wait(); s.CFrame = scf; s.Anchored = false end end
 godToggleBtn.MouseButton1Click:Connect(function() states.god = not states.god; godToggleBtn.Text = "God Mode : " .. (states.god and "ON" or "OFF"); if states.god then GodModeSeatNoInvis(true); godConnection = rs.Heartbeat:Connect(function() if char and hum and hrp then hum.MaxHealth = math.huge; hum.Health = math.huge; hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false) end end) else if godConnection then godConnection:Disconnect() end; GodModeSeatNoInvis(false); if hum then hum.MaxHealth = 100; hum.Health = 100; hum:SetStateEnabled(Enum.HumanoidStateType.Dead, true) end end end)
 
-local invisSubFrame = Instance.new("Frame", screenGui); invisSubFrame.Size = UDim2.new(0, 150, 0, 100); invisSubFrame.Position = UDim2.new(0.5, -75, 0.5, -50); invisSubFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255); invisSubFrame.BackgroundTransparency = 0; invisSubFrame.Visible = false; invisSubFrame.Active = true; invisSubFrame.Draggable = true; Instance.new("UICorner", invisSubFrame); applyBlackGreyGradient(invisSubFrame)
-local invisToggleBtn = Instance.new("TextButton", invisSubFrame); invisToggleBtn.Size = UDim2.new(0.8, 0, 0.4, 0); invisToggleBtn.Position = UDim2.new(0.1, 0, 0.45, 0); invisToggleBtn.Text = "Invisible : OFF"; invisToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255); invisToggleBtn.BackgroundTransparency = 0; invisToggleBtn.TextTransparency = 0; invisToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255); invisToggleBtn.TextStrokeTransparency = 0; invisToggleBtn.TextStrokeColor3 = Color3.new(0, 0, 0); Instance.new("UICorner", invisToggleBtn); applyBlackGreyGradient(invisToggleBtn)
+local invisSubFrame = Instance.new("Frame", screenGui); invisSubFrame.Size = UDim2.new(0, 150, 0, 100); invisSubFrame.Position = UDim2.new(0.5, -75, 0.5, -50); invisSubFrame.BackgroundColor3 = Color3.fromRGB(55, 55, 65); invisSubFrame.BackgroundTransparency = 0; invisSubFrame.Visible = false; invisSubFrame.Active = true; invisSubFrame.Draggable = true; Instance.new("UICorner", invisSubFrame); applyBlackGreyGradient(invisSubFrame)
+local invisToggleBtn = Instance.new("TextButton", invisSubFrame); invisToggleBtn.Size = UDim2.new(0.8, 0, 0.4, 0); invisToggleBtn.Position = UDim2.new(0.1, 0, 0.45, 0); invisToggleBtn.Text = "Invisible : OFF"; invisToggleBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75); invisToggleBtn.BackgroundTransparency = 0; invisToggleBtn.TextTransparency = 0; invisToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255); invisToggleBtn.TextStrokeTransparency = 0; invisToggleBtn.TextStrokeColor3 = Color3.new(0, 0, 0); Instance.new("UICorner", invisToggleBtn); applyBlackGreyGradient(invisToggleBtn)
 
 local invisCloseBtn = Instance.new("TextButton", invisSubFrame)
 invisCloseBtn.Size = UDim2.new(0, 24, 0, 24)
@@ -1346,7 +1346,7 @@ invisCloseBtn.Text = "X"
 invisCloseBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
 invisCloseBtn.Font = Enum.Font.GothamBold
 invisCloseBtn.TextSize = 12
-invisCloseBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+invisCloseBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
 Instance.new("UICorner", invisCloseBtn).CornerRadius = UDim.new(0, 4)
 applyBlackGreyGradient(invisCloseBtn)
 invisCloseBtn.MouseButton1Click:Connect(function()
@@ -1392,9 +1392,9 @@ end
 
 invisToggleBtn.MouseButton1Click:Connect(function() states.invis = not states.invis; invisToggleBtn.Text = "Invisible : " .. (states.invis and "ON" or "OFF"); setInvisState(states.invis) end)
 
-local execMainFrame = Instance.new("Frame", screenGui); execMainFrame.Size = UDim2.new(0, 300, 0, 220); execMainFrame.Position = UDim2.new(0.5, -150, 0.5, -110); execMainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255); execMainFrame.BackgroundTransparency = 0; execMainFrame.Visible = false; execMainFrame.Active = true; execMainFrame.Draggable = true; Instance.new("UICorner", execMainFrame); applyBlackGreyGradient(execMainFrame)
-local execTextBox = Instance.new("TextBox", execMainFrame); execTextBox.Size = UDim2.new(1, -20, 0, 130); execTextBox.Position = UDim2.new(0, 10, 0, 40); execTextBox.BackgroundColor3 = Color3.fromRGB(10, 10, 10); execTextBox.TextColor3 = Color3.fromRGB(255, 255, 255); execTextBox.ClearTextOnFocus = false; execTextBox.MultiLine = true; execTextBox.Font = Enum.Font.Code; execTextBox.TextSize = 10; Instance.new("UICorner", execTextBox)
-local executeSubBtn = Instance.new("TextButton", execMainFrame); executeSubBtn.Size = UDim2.new(0, 85, 0, 35); executeSubBtn.Position = UDim2.new(0, 10, 0, 175); executeSubBtn.Text = "Execute"; executeSubBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255); executeSubBtn.BackgroundTransparency = 0; executeSubBtn.TextTransparency = 0; executeSubBtn.TextColor3 = Color3.fromRGB(255, 255, 255); executeSubBtn.TextStrokeTransparency = 0; executeSubBtn.TextStrokeColor3 = Color3.new(0, 0, 0); Instance.new("UICorner", executeSubBtn); applyBlackGreyGradient(executeSubBtn)
+local execMainFrame = Instance.new("Frame", screenGui); execMainFrame.Size = UDim2.new(0, 300, 0, 220); execMainFrame.Position = UDim2.new(0.5, -150, 0.5, -110); execMainFrame.BackgroundColor3 = Color3.fromRGB(55, 55, 65); execMainFrame.BackgroundTransparency = 0; execMainFrame.Visible = false; execMainFrame.Active = true; execMainFrame.Draggable = true; Instance.new("UICorner", execMainFrame); applyBlackGreyGradient(execMainFrame)
+local execTextBox = Instance.new("TextBox", execMainFrame); execTextBox.Size = UDim2.new(1, -20, 0, 130); execTextBox.Position = UDim2.new(0, 10, 0, 40); execTextBox.BackgroundColor3 = Color3.fromRGB(20, 20, 25); execTextBox.TextColor3 = Color3.fromRGB(255, 255, 255); execTextBox.ClearTextOnFocus = false; execTextBox.MultiLine = true; execTextBox.Font = Enum.Font.Code; execTextBox.TextSize = 10; Instance.new("UICorner", execTextBox)
+local executeSubBtn = Instance.new("TextButton", execMainFrame); executeSubBtn.Size = UDim2.new(0, 85, 0, 35); executeSubBtn.Position = UDim2.new(0, 10, 0, 175); executeSubBtn.Text = "Execute"; executeSubBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75); executeSubBtn.BackgroundTransparency = 0; executeSubBtn.TextTransparency = 0; executeSubBtn.TextColor3 = Color3.fromRGB(255, 255, 255); executeSubBtn.TextStrokeTransparency = 0; executeSubBtn.TextStrokeColor3 = Color3.new(0, 0, 0); Instance.new("UICorner", executeSubBtn); applyBlackGreyGradient(executeSubBtn)
 executeSubBtn.MouseButton1Click:Connect(function() if execTextBox.Text ~= "" then pcall(function() local func = loadstring(execTextBox.Text); if func then func() end end) end end)
 
 local function miniFling(playerToFling)
@@ -1676,7 +1676,7 @@ else
     keyGui.Name = "KeyGui"
     keyGui.Size = UDim2.new(0, 360, 0, 385)
     keyGui.Position = UDim2.new(0.5, -180, 0.5, -192) -- PRESISI TENGAH KHUSUS HP 64-BIT
-    keyGui.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    keyGui.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
     keyGui.BackgroundTransparency = 0
     keyGui.BorderSizePixel = 0
     keyGui.Active = true
@@ -1712,7 +1712,7 @@ else
     local keyTextBox = Instance.new("TextBox")
     keyTextBox.Size = UDim2.new(0.85, 0, 0, 35)
     keyTextBox.Position = UDim2.new(0.075, 0, 0, 90)
-    keyTextBox.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+    keyTextBox.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
     keyTextBox.Text = ""
     keyTextBox.PlaceholderText = "Example_Key"
     keyTextBox.TextTransparency = 0
@@ -1726,7 +1726,7 @@ else
     getKeyBtn.Size = UDim2.new(0.4, 0, 0, 35)
     getKeyBtn.Position = UDim2.new(0.075, 0, 0, 140)
     getKeyBtn.Text = "Get Key"
-    getKeyBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    getKeyBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
     getKeyBtn.BackgroundTransparency = 0
     getKeyBtn.TextTransparency = 0
     getKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1742,7 +1742,7 @@ else
     confirmBtn.Size = UDim2.new(0.4, 0, 0, 35)
     confirmBtn.Position = UDim2.new(0.525, 0, 0, 140)
     confirmBtn.Text = "Confirm"
-    confirmBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    confirmBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
     confirmBtn.BackgroundTransparency = 0
     confirmBtn.TextTransparency = 0
     confirmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1776,7 +1776,7 @@ else
         qBtn.Size = UDim2.new(0.65, 0, 0, 35)
         qBtn.Position = UDim2.new(0, 0, 0, (i-1) * 45)
         qBtn.Text = q.text
-        qBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+        qBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
         qBtn.BackgroundTransparency = 0
         qBtn.TextTransparency = 0
         qBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1793,7 +1793,7 @@ else
         cdLabel.Size = UDim2.new(0.3, 0, 0, 35)
         cdLabel.Position = UDim2.new(0.7, 0, 0, (i-1) * 45)
         cdLabel.Text = q.cd .. " s"
-        cdLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+        cdLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
         cdLabel.TextTransparency = 0
         cdLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         cdLabel.Font = Enum.Font.GothamBold
@@ -1865,7 +1865,7 @@ else
     copyActionBtn.Size = UDim2.new(0.5, 0, 0, 35)
     copyActionBtn.Position = UDim2.new(0.25, 0, 0, 160)
     copyActionBtn.Text = "Click to Copy Key"
-    copyActionBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    copyActionBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
     copyActionBtn.BackgroundTransparency = 0
     copyActionBtn.TextTransparency = 0
     copyActionBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1894,7 +1894,7 @@ else
     closeCopyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     closeCopyBtn.TextStrokeTransparency = 0.5
     closeCopyBtn.TextStrokeColor3 = Color3.new(0, 0, 0)
-    closeCopyBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    closeCopyBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
     closeCopyBtn.BackgroundTransparency = 0
     closeCopyBtn.Font = Enum.Font.GothamBold
     closeCopyBtn.TextSize = 14
