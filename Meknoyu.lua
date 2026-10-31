@@ -9,15 +9,20 @@ local lighting = game:GetService("Lighting")
 local guiService = game:GetService("GuiService")
 local TweenService = game:GetService("TweenService")
 local HapticService = game:GetService("HapticService")
+local StatsService = game:GetService("Stats")
+local HttpService = game:GetService("HttpService")
 local cam = workspace.CurrentCamera
 local mouse = plr:GetMouse()
 
--- // FUNGSI PEMBUAT GRADIENT (DISESUAIKAN AGAR BACKGROUND LEBIH TERANG & KONTRAS) //
+-- // CONFIG DISCORD WEBHOOK //
+local DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL_HERE"
+
+-- // FUNGSI PEMBUAT GRADIENT //
 local function applyBlackGreyGradient(instance)
     local uiGradient = Instance.new("UIGradient")
     uiGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(65, 65, 70)), -- Abu-abu sedang (lebih terang)
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 35))  -- Gelap sedang
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(65, 65, 70)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 35))
     })
     uiGradient.Parent = instance
     return uiGradient
@@ -30,9 +35,96 @@ screenGui.ResetOnSpawn = false
 screenGui.Parent = (gethui and gethui()) or plr:WaitForChild("PlayerGui")
 
 -- ==========================================
+--        SISTEM NOTIFIKASI CUSTOM UI
+-- ==========================================
+local notifContainer = Instance.new("Frame", screenGui)
+notifContainer.Size = UDim2.new(0, 250, 1, 0)
+notifContainer.Position = UDim2.new(1, -260, 0, 10)
+notifContainer.BackgroundTransparency = 1
+
+local notifLayout = Instance.new("UIListLayout", notifContainer)
+notifLayout.Padding = UDim.new(0, 8)
+notifLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+notifLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+
+local function customNotify(title, text, duration)
+    duration = duration or 4
+    local frame = Instance.new("Frame", notifContainer)
+    frame.Size = UDim2.new(0, 240, 0, 60)
+    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    frame.BackgroundTransparency = 0.1
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
+    applyBlackGreyGradient(frame)
+
+    local stroke = Instance.new("UIStroke", frame)
+    stroke.Thickness = 1.5
+    stroke.Color = Color3.fromRGB(255, 0, 128)
+
+    local tLabel = Instance.new("TextLabel", frame)
+    tLabel.Size = UDim2.new(1, -10, 0, 20)
+    tLabel.Position = UDim2.new(0, 10, 0, 5)
+    tLabel.Text = title
+    tLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tLabel.Font = Enum.Font.GothamBold
+    tLabel.TextSize = 12
+    tLabel.TextXAlignment = Enum.TextXAlignment.Left
+    tLabel.BackgroundTransparency = 1
+
+    local bLabel = Instance.new("TextLabel", frame)
+    bLabel.Size = UDim2.new(1, -15, 0, 30)
+    bLabel.Position = UDim2.new(0, 10, 0, 25)
+    bLabel.Text = text
+    bLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    bLabel.Font = Enum.Font.Gotham
+    bLabel.TextSize = 10
+    bLabel.TextWrapped = true
+    bLabel.TextXAlignment = Enum.TextXAlignment.Left
+    bLabel.BackgroundTransparency = 1
+
+    task.spawn(function()
+        task.wait(duration)
+        local tw = TweenService:Create(frame, TweenInfo.new(0.3), {BackgroundTransparency = 1})
+        TweenService:Create(tLabel, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
+        TweenService:Create(bLabel, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
+        TweenService:Create(stroke, TweenInfo.new(0.3), {Transparency = 1}):Play()
+        tw:Play()
+        tw.Completed:Connect(function() frame:Destroy() end)
+    end)
+end
+
+-- ==========================================
+--        SEND DISCORD WEBHOOK LOGIC
+-- ==========================================
+local function sendWebhook()
+    if DISCORD_WEBHOOK_URL == "" or DISCORD_WEBHOOK_URL:find("YOUR_WEBHOOK") then return end
+    local req = (syn and syn.request) or (http and http.request) or http_request or request
+    if req then
+        local data = {
+            ["embeds"] = {{
+                ["title"] = "Meknoyu GUI Executed!",
+                ["color"] = 16711808,
+                ["fields"] = {
+                    {["name"] = "Player", ["value"] = plr.Name .. " (" .. plr.UserId .. ")", ["inline"] = true},
+                    {["name"] = "Game ID", ["value"] = tostring(game.PlaceId), ["inline"] = true},
+                    {["name"] = "Job ID", ["value"] = tostring(game.JobId), ["inline"] = false}
+                },
+                ["footer"] = {["text"] = "Meknoyu System Logs"}
+            }}
+        }
+        req({
+            Url = DISCORD_WEBHOOK_URL,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode(data)
+        })
+    end
+end
+
+-- ==========================================
 --        MAIN MEKNOYU ENGINE LOAD
 -- ==========================================
 local function mainEngineLoad()
+sendWebhook()
 
 local states = {god=false, noclip=false, esp=false, tracer=false, fling=false, antifling=false, infJump=false, speed=false, fps=false, antirag=false, antijail=false, bypassac=false, tooltp=false, antitel=false, aimbot=false, aimActive=false, antirobux=false, savepos=false, disco=false, hcxxr=false, addpart=false, xray=false, tpKill=false, antiafk=false, invis=false, antivoid=false, antilag=false}
 local originalTransparencies = {}
@@ -42,7 +134,7 @@ local hrp = char:WaitForChild("HumanoidRootPart", 10)
 local godConnection, lastPos, savedPos = nil, nil, nil
 local platformPart = nil
 local voidPart = nil
-local invisOffset = -100
+local invisOffset = -150
 
 -- LOGIKA ANTI DETECT BARU
 local oldIndex, oldNewIndex
@@ -131,7 +223,7 @@ local function applyAntiDetect(state)
     end
 end
 
-starterGui:SetCore("SendNotification", { Title = "Meknoyu GUI", Text = "System Fully Loaded!", Duration = 5 })
+customNotify("Meknoyu GUI", "System Fully Loaded!", 5)
 
 --// LANGIT MEKNOYU TEAMS //--
 local discoSky = Instance.new("Sky")
@@ -200,14 +292,41 @@ local clickTpBtn = Instance.new("TextButton", tpBackGui); clickTpBtn.Size = UDim
 saveBtn.MouseButton1Click:Connect(function() states.savepos = not states.savepos; saveBtn.Text = "Save Pos : " .. (states.savepos and "ON" or "OFF"); if states.savepos and hrp then savedPos = hrp.CFrame; lastPos = savedPos end end)
 clickTpBtn.MouseButton1Click:Connect(function() if savedPos and hrp then savedPos = savedPos; wait(0.1); hrp.CFrame = savedPos end end)
 
--- // MAIN GUI STRUCTURE //
+-- // MAIN GUI STRUCTURE (UKURAN RASIO 17 x 10 => 510 x 300) //
 local main = Instance.new("Frame", screenGui)
-main.Size = UDim2.new(0, 450, 0, 300)
-main.Position = UDim2.new(0.5, -225, 0.5, -150)
+main.Size = UDim2.new(0, 510, 0, 300)
+main.Position = UDim2.new(0.5, -255, 0.5, -150)
 main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 main.BackgroundTransparency = 0
 main.Active = true; main.Draggable = true; Instance.new("UICorner", main)
 applyBlackGreyGradient(main)
+
+-- ==========================================
+--        SISTEM DISPLAY FPS & MS (PING)
+-- ==========================================
+local statsLabel = Instance.new("TextLabel", main)
+statsLabel.Size = UDim2.new(0, 120, 0, 20)
+statsLabel.Position = UDim2.new(1, -210, 0, 7)
+statsLabel.BackgroundTransparency = 1
+statsLabel.Text = "FPS: -- | MS: --"
+statsLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
+statsLabel.Font = Enum.Font.Code
+statsLabel.TextSize = 10
+statsLabel.TextXAlignment = Enum.TextXAlignment.Right
+
+local lastFrameTime = os.clock()
+local frameCount = 0
+rs.RenderStepped:Connect(function()
+    frameCount = frameCount + 1
+    local currentTime = os.clock()
+    if currentTime - lastFrameTime >= 1 then
+        local fps = math.floor(frameCount / (currentTime - lastFrameTime))
+        local ping = math.floor(StatsService.Network.ServerStatsItem["Data Ping"]:GetValue())
+        statsLabel.Text = "FPS: " .. fps .. " | MS: " .. ping
+        frameCount = 0
+        lastFrameTime = currentTime
+    end
+end)
 
 local stroke = Instance.new("UIStroke", main)
 stroke.Thickness = 2.5
@@ -244,13 +363,42 @@ rainbowConnection = rs.RenderStepped:Connect(function()
     end
 end)
 
+-- ==========================================
+--        3 BULATAN KECIL DI POJOK KIRI ATAS
+-- ==========================================
+local topDotsContainer = Instance.new("Frame", main)
+topDotsContainer.Size = UDim2.new(0, 50, 0, 15)
+topDotsContainer.Position = UDim2.new(0, 8, 0, 8)
+topDotsContainer.BackgroundTransparency = 1
+
+local dotRed = Instance.new("Frame", topDotsContainer)
+dotRed.Size = UDim2.new(0, 10, 0, 10)
+dotRed.Position = UDim2.new(0, 0, 0.5, -5)
+dotRed.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
+dotRed.BorderSizePixel = 0
+Instance.new("UICorner", dotRed).CornerRadius = UDim.new(1, 0)
+
+local dotYellow = Instance.new("Frame", topDotsContainer)
+dotYellow.Size = UDim2.new(0, 10, 0, 10)
+dotYellow.Position = UDim2.new(0, 14, 0.5, -5)
+dotYellow.BackgroundColor3 = Color3.fromRGB(255, 189, 46)
+dotYellow.BorderSizePixel = 0
+Instance.new("UICorner", dotYellow).CornerRadius = UDim.new(1, 0)
+
+local dotGreen = Instance.new("Frame", topDotsContainer)
+dotGreen.Size = UDim2.new(0, 10, 0, 10)
+dotGreen.Position = UDim2.new(0, 28, 0.5, -5)
+dotGreen.BackgroundColor3 = Color3.fromRGB(39, 201, 63)
+dotGreen.BorderSizePixel = 0
+Instance.new("UICorner", dotGreen).CornerRadius = UDim.new(1, 0)
+
 local header = Instance.new("TextLabel", main)
-header.Size = UDim2.new(1, -110, 0, 25); header.Position = UDim2.new(0, 110, 0, 5)
+header.Size = UDim2.new(1, -210, 0, 25); header.Position = UDim2.new(0, 65, 0, 5)
 header.Text = "MEKNOYU GUI | HUB"; header.BackgroundTransparency = 1; header.TextTransparency = 0; header.TextColor3 = Color3.new(1,1,1); header.Font = Enum.Font.GothamBold; header.TextSize = 18; header.TextXAlignment = Enum.TextXAlignment.Left
 
 local keySystemLabel = Instance.new("TextLabel", main)
-keySystemLabel.Size = UDim2.new(1, -110, 0, 15)
-keySystemLabel.Position = UDim2.new(0, 110, 0, 26)
+keySystemLabel.Size = UDim2.new(1, -210, 0, 15)
+keySystemLabel.Position = UDim2.new(0, 65, 0, 26)
 keySystemLabel.BackgroundTransparency = 1
 keySystemLabel.TextTransparency = 0
 keySystemLabel.Font = Enum.Font.GothamMedium
@@ -267,10 +415,49 @@ end
 local closeBtn = Instance.new("TextButton", main); closeBtn.Size = UDim2.new(0, 30, 0, 30); closeBtn.Position = UDim2.new(1, -35, 0, 7); closeBtn.Text = "X"; closeBtn.TextTransparency = 0; closeBtn.TextColor3 = Color3.new(1,0,0); closeBtn.TextStrokeTransparency = 0; closeBtn.TextStrokeColor3 = Color3.new(0,0,0); closeBtn.BackgroundColor3 = Color3.fromRGB(255,255,255); closeBtn.BackgroundTransparency = 0; Instance.new("UICorner", closeBtn); applyBlackGreyGradient(closeBtn)
 
 -- ==========================================
+--        FITUR KUSTOM KEYBIND E (DI ATAS KANAN)
+-- ==========================================
+local currentToggleKey = Enum.KeyCode.E
+local bindBox = Instance.new("TextBox", main)
+bindBox.Size = UDim2.new(0, 35, 0, 30)
+bindBox.Position = UDim2.new(1, -75, 0, 7)
+bindBox.Text = "E"
+bindBox.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+bindBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+bindBox.Font = Enum.Font.GothamBold
+bindBox.TextSize = 12
+bindBox.ClearTextOnFocus = false
+Instance.new("UICorner", bindBox)
+applyBlackGreyGradient(bindBox)
+
+bindBox.FocusLost:Connect(function()
+    local text = string.upper(bindBox.Text)
+    if #text > 0 then
+        local keyEnum = Enum.KeyCode[string.sub(text, 1, 1)]
+        if keyEnum then
+            currentToggleKey = keyEnum
+            bindBox.Text = string.sub(text, 1, 1)
+        else
+            bindBox.Text = string.sub(tostring(currentToggleKey.Name), 1, 1)
+        end
+    end
+end)
+
+UIS.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == currentToggleKey then
+        if main.Visible then
+            closeBtn.MouseButton1Click:Fire()
+        else
+            miniBtn.MouseButton1Click:Fire()
+        end
+    end
+end)
+
+-- ==========================================
 --        SISTEM ANIMASI TWEEN (OPEN/CLOSE)
 -- ==========================================
-local originalMainSize = UDim2.new(0, 450, 0, 300)
-local originalMainPos = UDim2.new(0.5, -225, 0.5, -150)
+local originalMainSize = UDim2.new(0, 510, 0, 300)
+local originalMainPos = UDim2.new(0.5, -255, 0.5, -150)
 local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 
 closeBtn.MouseButton1Click:Connect(function()
@@ -301,24 +488,24 @@ miniBtn.MouseButton1Click:Connect(function()
 end)
 
 local tabContainer = Instance.new("ScrollingFrame", main)
-tabContainer.Size = UDim2.new(0, 100, 1, -85)
-tabContainer.Position = UDim2.new(0, 5, 0, 5)
+tabContainer.Size = UDim2.new(0, 100, 1, -150)
+tabContainer.Position = UDim2.new(0, 5, 0, 48)
 tabContainer.BackgroundTransparency = 1
 tabContainer.ScrollBarThickness = 0
 tabContainer.CanvasSize = UDim2.new(0, 0, 1.8, 0)
 local UIList = Instance.new("UIListLayout", tabContainer); UIList.Padding = UDim.new(0, 5)
 
 -- ==========================================
---        SISTEM PROFIL POJOK KIRI BAWAH
+--        SISTEM PROFIL & INFO MAP DI BAWAH KIRI (DITURUNKAN AMAN)
 -- ==========================================
 local profileFrame = Instance.new("Frame", main)
-profileFrame.Size = UDim2.new(0, 100, 0, 70)
-profileFrame.Position = UDim2.new(0, 5, 1, -75)
+profileFrame.Size = UDim2.new(0, 100, 0, 95)
+profileFrame.Position = UDim2.new(0, 5, 1, -98)
 profileFrame.BackgroundTransparency = 1
 
 local profilePic = Instance.new("ImageLabel", profileFrame)
 profilePic.Size = UDim2.new(0, 32, 0, 32)
-profilePic.Position = UDim2.new(0, 2, 0, 5)
+profilePic.Position = UDim2.new(0, 2, 0, 2)
 profilePic.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 profilePic.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. plr.UserId .. "&width=150&height=150&format=png"
 Instance.new("UICorner", profilePic).CornerRadius = UDim.new(1, 0)
@@ -332,7 +519,7 @@ end)
 
 local displayNameLabel = Instance.new("TextLabel", profileFrame)
 displayNameLabel.Size = UDim2.new(0, 60, 0, 12)
-displayNameLabel.Position = UDim2.new(0, 38, 0, 8)
+displayNameLabel.Position = UDim2.new(0, 38, 0, 2)
 displayNameLabel.BackgroundTransparency = 1
 displayNameLabel.TextTransparency = 0
 displayNameLabel.Text = "Name: " .. plr.DisplayName
@@ -343,7 +530,7 @@ displayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 local useridLabel = Instance.new("TextLabel", profileFrame)
 useridLabel.Size = UDim2.new(0, 60, 0, 12)
-useridLabel.Position = UDim2.new(0, 38, 0, 20)
+useridLabel.Position = UDim2.new(0, 38, 0, 14)
 useridLabel.BackgroundTransparency = 1
 useridLabel.TextTransparency = 0
 useridLabel.Text = "UserID: " .. plr.UserId
@@ -352,11 +539,45 @@ useridLabel.Font = Enum.Font.GothamMedium
 useridLabel.TextSize = 7
 useridLabel.TextXAlignment = Enum.TextXAlignment.Left
 
+-- Fitur Gambar Map & Nama Map Asli di Pojok Kiri Bawah
+local mapIcon = Instance.new("ImageLabel", profileFrame)
+mapIcon.Size = UDim2.new(0, 22, 0, 22)
+mapIcon.Position = UDim2.new(0, 2, 0, 38)
+mapIcon.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+Instance.new("UICorner", mapIcon).CornerRadius = UDim.new(0, 4)
+
+local mapNameLabel = Instance.new("TextLabel", profileFrame)
+mapNameLabel.Size = UDim2.new(0, 72, 0, 25)
+mapNameLabel.Position = UDim2.new(0, 28, 0, 36)
+mapNameLabel.BackgroundTransparency = 1
+mapNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+mapNameLabel.Font = Enum.Font.GothamBold
+mapNameLabel.TextSize = 8
+mapNameLabel.TextWrapped = true
+mapNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+task.spawn(function()
+    local success, info = pcall(function()
+        return mps:GetProductInfo(game.PlaceId)
+    end)
+    if success and info then
+        mapNameLabel.Text = "Name Map:\n" .. info.Name
+        if info.IconImageAssetId and info.IconImageAssetId > 0 then
+            mapIcon.Image = "rbxassetid://" .. tostring(info.IconImageAssetId)
+        else
+            mapIcon.Image = "rbxassetid://6023426915"
+        end
+    else
+        mapNameLabel.Text = "Name Map:\n" .. game.Name
+        mapIcon.Image = "rbxassetid://6023426915"
+    end
+end)
+
 local pages = Instance.new("Frame", main); pages.Size = UDim2.new(1, -115, 1, -50); pages.Position = UDim2.new(0, 110, 0, 45); pages.BackgroundTransparency = 1
 
 local function createPage(name)
-    local p = Instance.new("ScrollingFrame", pages); p.Name = name; p.Size = UDim2.new(1, 0, 1, 0); p.Visible = false; p.BackgroundTransparency = 1; p.ScrollBarThickness = 2; p.CanvasSize = UDim2.new(0, 0, 2.5, 0)
-    local grid = Instance.new("UIGridLayout", p); grid.CellSize = UDim2.new(0.48, 0, 0, 35); grid.CellPadding = UDim2.new(0, 5, 0, 5)
+    local p = Instance.new("ScrollingFrame", pages); p.Name = name; p.Size = UDim2.new(1, 0, 1, 0); p.Visible = false; p.BackgroundTransparency = 1; p.ScrollBarThickness = 2; p.CanvasSize = UDim2.new(0, 0, 3.2, 0)
+    local grid = Instance.new("UIGridLayout", p); grid.CellSize = UDim2.new(0.48, 0, 0, 32); grid.CellPadding = UDim2.new(0, 5, 0, 5)
     return p
 end
 
@@ -1001,7 +1222,9 @@ createGameBtn("Server New", pageServer, function()
     end)
 end)
 
--- // TOGGLE BUTTON CREATOR //
+-- ==========================================
+--        TOGGLE BUTTON CREATOR
+-- ==========================================
 local function createToggleBtn(name, key, parent)
     local b = Instance.new("TextButton", parent)
     b.Text = name .. " : OFF"
@@ -1116,6 +1339,20 @@ godToggleBtn.MouseButton1Click:Connect(function() states.god = not states.god; g
 local invisSubFrame = Instance.new("Frame", screenGui); invisSubFrame.Size = UDim2.new(0, 150, 0, 100); invisSubFrame.Position = UDim2.new(0.5, -75, 0.5, -50); invisSubFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255); invisSubFrame.BackgroundTransparency = 0; invisSubFrame.Visible = false; invisSubFrame.Active = true; invisSubFrame.Draggable = true; Instance.new("UICorner", invisSubFrame); applyBlackGreyGradient(invisSubFrame)
 local invisToggleBtn = Instance.new("TextButton", invisSubFrame); invisToggleBtn.Size = UDim2.new(0.8, 0, 0.4, 0); invisToggleBtn.Position = UDim2.new(0.1, 0, 0.45, 0); invisToggleBtn.Text = "Invisible : OFF"; invisToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255); invisToggleBtn.BackgroundTransparency = 0; invisToggleBtn.TextTransparency = 0; invisToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255); invisToggleBtn.TextStrokeTransparency = 0; invisToggleBtn.TextStrokeColor3 = Color3.new(0, 0, 0); Instance.new("UICorner", invisToggleBtn); applyBlackGreyGradient(invisToggleBtn)
 
+local invisCloseBtn = Instance.new("TextButton", invisSubFrame)
+invisCloseBtn.Size = UDim2.new(0, 24, 0, 24)
+invisCloseBtn.Position = UDim2.new(1, -28, 0, 4)
+invisCloseBtn.Text = "X"
+invisCloseBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
+invisCloseBtn.Font = Enum.Font.GothamBold
+invisCloseBtn.TextSize = 12
+invisCloseBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+Instance.new("UICorner", invisCloseBtn).CornerRadius = UDim.new(0, 4)
+applyBlackGreyGradient(invisCloseBtn)
+invisCloseBtn.MouseButton1Click:Connect(function()
+    invisSubFrame.Visible = false
+end)
+
 local function setInvisState(state)
     local c = plr.Character; if not c then return end
     for _, o in pairs(workspace:GetChildren()) do
@@ -1224,7 +1461,7 @@ createPlainBtn("KILL ALL", pageNoToggle, function() for i = 1, 10 do for _, p in
 createPlainBtn("Fling All", pageNoToggle, function() task.spawn(function() for _, p in pairs(players:GetPlayers()) do if p ~= plr and p.Character then miniFling(p) end end end) end)
 createPlainBtn("Dark Dex", pageNoToggle, function() loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))() end)
 createPlainBtn("Message Horror", pageNoToggle, function() task.spawn(function() local oldFrame = Instance.new("Frame", screenGui); oldFrame.Size = UDim2.new(1, 0, 0.25, 0); oldFrame.Position = UDim2.new(0, 0, 0.35, 0); oldFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0); oldFrame.BackgroundTransparency = 0.4; local oldLabel = Instance.new("TextLabel", oldFrame); oldLabel.Size = UDim2.new(1, 0, 1, 0); oldLabel.BackgroundTransparency = 1; oldLabel.TextColor3 = Color3.fromRGB(255, 255, 255); oldLabel.TextSize = 32; oldLabel.Font = Enum.Font.Legacy; oldLabel.Text = "Are you stuck here forever?"; task.wait(3.5); oldLabel.Text = "You're scared here hahahaha😈"; task.wait(3.5); oldLabel.Text = "I'm going to crash this server now hahahaha"; task.wait(3.5); oldFrame:Destroy() end) end)
-createPlainBtn("MAN??? (Server Cook)", pageNoToggle, function() task.spawn(function() while true do starterGui:SetCore("SendNotification", { Title = "Mekno Team", Text = "SERVER ARE COOKED NGAW😈", Duration = 9999 }); task.wait(0.5) end end); local topGui = screenGui:FindFirstChild("MeknoTopPermanent") or Instance.new("ScreenGui", screenGui); topGui.Name = "MeknoTopPermanent"; topGui.DisplayOrder = 1000000; local topFrame = Instance.new("Frame", topGui); topFrame.Size = UDim2.new(0, 500, 0, 35); topFrame.Position = UDim2.new(0.5, -250, 0.02, 0); topFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0); local topLabel = Instance.new("TextLabel", topFrame); topLabel.Size = UDim2.new(1, 0, 1, 0); topLabel.BackgroundTransparency = 1; topLabel.Text = "KEBIXEVEBJDDGEBEJDOXI3ERKF9U3V33R8V3B33INXC"; topLabel.TextColor3 = Color3.new(1,1,1); topLabel.TextScaled = true; task.wait(0.1); local loadGui = Instance.new("ScreenGui", screenGui); loadGui.DisplayOrder = 999999; local loadFrame = Instance.new("Frame", loadGui); loadFrame.Size = UDim2.new(1,0,1,0); local cookLabel = Instance.new("TextLabel", loadFrame); cookLabel.Size = UDim2.new(1, 0, 0.3, 0); cookLabel.Position = UDim2.new(0, 0, 0.35, 0); cookLabel.BackgroundTransparency = 1; cookLabel.Text = "YOUXXXXXXXAREXXXXXCOOKKED😈XXXX"; cookLabel.TextColor3 = Color3.new(0,0,0); cookLabel.TextSize = 42; local cn = rs.RenderStepped:Connect(function() loadFrame.BackgroundColor3 = Color3.fromHSV((tick() * 0.5) % 1, 0.8, 1) end); task.wait(5); cn:Disconnect(); loadGui:Destroy(); for _, obj in pairs(workspace:GetChildren()) do if not obj:IsA("Camera") and not obj:IsA("Terrain") and not players:GetPlayerFromCharacter(obj) then if obj:IsA("BasePart") then obj.Transparency = 1; obj.CanCollide = false elseif obj:IsA("Model") or obj:IsA("Folder") then for _, child in pairs(obj:GetDescendants()) do if child:IsA("BasePart") then child.Transparency = 1; child.CanCollide = false end end end end end; local bp = workspace:FindFirstChild("MeknoLocalBaseplate") or Instance.new("Part", workspace); bp.Name = "MeknoLocalBaseplate"; bp.Size = Vector3.new(2000, 4, 2000); bp.Position = Vector3.new(0, -2, 0); bp.Anchored = true; bp.CanCollide = true; if hrp then lastPos = CFrame.new(0, 5, 0); hrp.CFrame = lastPos end; local horrorTracks = {1837874627, 1836740615, 1843358057, 1839019688, 1841348122}; for _, audioId in pairs(horrorTracks) do task.spawn(function() local sound = Instance.new("Sound", workspace); sound.SoundId = "rbxassetid://" .. audioId; sound.Volume = 6; sound.Looped = true; sound:Play() end) end; local rainPart = Instance.new("Part", workspace); rainPart.Size = Vector3.new(2000, 1, 2000); rainPart.Position = Vector3.new(0, 150, 0); rainPart.Anchored = true; rainPart.Transparency = 1; rainPart.CanCollide = false; local attachment = Instance.new("Attachment", rainPart); local bloodRain = Instance.new("ParticleEmitter", attachment); bloodRain.Texture = "rbxassetid://242336336"; bloodRain.Rate = 50000; bloodRain.Speed = NumberRange.new(120, 180); bloodRain.Lifetime = NumberRange.new(3, 4) end)
+createPlainBtn("MAN??? (Server Cook)", pageNoToggle, function() task.spawn(function() while true do customNotify("Mekno Team", "SERVER ARE COOKED NGAW😈", 9999); task.wait(0.5) end end); local topGui = screenGui:FindFirstChild("MeknoTopPermanent") or Instance.new("ScreenGui", screenGui); topGui.Name = "MeknoTopPermanent"; topGui.DisplayOrder = 1000000; local topFrame = Instance.new("Frame", topGui); topFrame.Size = UDim2.new(0, 500, 0, 35); topFrame.Position = UDim2.new(0.5, -250, 0.02, 0); topFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0); local topLabel = Instance.new("TextLabel", topFrame); topLabel.Size = UDim2.new(1, 0, 1, 0); topLabel.BackgroundTransparency = 1; topLabel.Text = "KEBIXEVEBJDDGEBEJDOXI3ERKF9U3V33R8V3B33INXC"; topLabel.TextColor3 = Color3.new(1,1,1); topLabel.TextScaled = true; task.wait(0.1); local loadGui = Instance.new("ScreenGui", screenGui); loadGui.DisplayOrder = 999999; local loadFrame = Instance.new("Frame", loadGui); loadFrame.Size = UDim2.new(1,0,1,0); local cookLabel = Instance.new("TextLabel", loadFrame); cookLabel.Size = UDim2.new(1, 0, 0.3, 0); cookLabel.Position = UDim2.new(0, 0, 0.35, 0); cookLabel.BackgroundTransparency = 1; cookLabel.Text = "YOUXXXXXXXAREXXXXXCOOKKED😈XXXX"; cookLabel.TextColor3 = Color3.new(0,0,0); cookLabel.TextSize = 42; local cn = rs.RenderStepped:Connect(function() loadFrame.BackgroundColor3 = Color3.fromHSV((tick() * 0.5) % 1, 0.8, 1) end); task.wait(5); cn:Disconnect(); loadGui:Destroy(); for _, obj in pairs(workspace:GetChildren()) do if not obj:IsA("Camera") and not obj:IsA("Terrain") and not players:GetPlayerFromCharacter(obj) then if obj:IsA("BasePart") then obj.Transparency = 1; obj.CanCollide = false elseif obj:IsA("Model") or obj:IsA("Folder") then for _, child in pairs(obj:GetDescendants()) do if child:IsA("BasePart") then child.Transparency = 1; child.CanCollide = false end end end end end; local bp = workspace:FindFirstChild("MeknoLocalBaseplate") or Instance.new("Part", workspace); bp.Name = "MeknoLocalBaseplate"; bp.Size = Vector3.new(2000, 4, 2000); bp.Position = Vector3.new(0, -2, 0); bp.Anchored = true; bp.CanCollide = true; if hrp then lastPos = CFrame.new(0, 5, 0); hrp.CFrame = lastPos end; local horrorTracks = {1837874627, 1836740615, 1843358057, 1839019688, 1841348122}; for _, audioId in pairs(horrorTracks) do task.spawn(function() local sound = Instance.new("Sound", workspace); sound.SoundId = "rbxassetid://" .. audioId; sound.Volume = 6; sound.Looped = true; sound:Play() end) end; local rainPart = Instance.new("Part", workspace); rainPart.Size = Vector3.new(2000, 1, 2000); rainPart.Position = Vector3.new(0, 150, 0); rainPart.Anchored = true; rainPart.Transparency = 1; rainPart.CanCollide = false; local attachment = Instance.new("Attachment", rainPart); local bloodRain = Instance.new("ParticleEmitter", attachment); bloodRain.Texture = "rbxassetid://242336336"; bloodRain.Rate = 50000; bloodRain.Speed = NumberRange.new(120, 180); bloodRain.Lifetime = NumberRange.new(3, 4) end)
 
 pageMain.Visible = true
 
@@ -1384,25 +1621,7 @@ end)
 --    SISTEM DETEKSI DEVICE (NOTIFIKASI MOBILE / BULAT)
 -- ==========================================================
 task.defer(function()
-    local bindable = Instance.new("BindableFunction")
-    
-    bindable.OnInvoke = function(choice)
-        if choice == "Yes" or choice == "No" then
-            main.Size = UDim2.new(0, 0, 0, 0)
-            main.Position = originalMainPos
-            main.Visible = false
-            miniBtn.Visible = true
-        end
-    end
-    
-    starterGui:SetCore("SendNotification", {
-        Title = "Device Mobile",
-        Text = "Are you a mobile device?",
-        Duration = 15,
-        Callback = bindable,
-        Button1 = "Yes",
-        Button2 = "No"
-    })
+    customNotify("Device Mobile", "Mobile UI Optimized", 5)
 end)
 
 end
@@ -1416,7 +1635,6 @@ else
     local keyVerified = false
     local currentGeneratedKey = ""
     local fileName = "Meknoyu_KeyData.json"
-    local HttpService = game:GetService("HttpService")
 
     local function saveKeyToDevice(key, durationInSeconds)
         local data = {
@@ -1435,7 +1653,7 @@ else
         if isfile(fileName) then
             local success, content = pcall(readfile, fileName)
             if success then
-                local success2, data = pcall(function() return HttpService:JSONEncode(content) end)
+                local success2, data = pcall(function() return HttpService:JSONDecode(content) end)
                 if success2 and data and data.SavedKey and data.ExpireTime then
                     if os.time() < data.ExpireTime then
                         currentGeneratedKey = data.SavedKey
@@ -1457,7 +1675,7 @@ else
     local keyGui = Instance.new("Frame")
     keyGui.Name = "KeyGui"
     keyGui.Size = UDim2.new(0, 360, 0, 385)
-    keyGui.Position = UDim2.new(0, -180, 0.5, -192)
+    keyGui.Position = UDim2.new(0.5, -180, 0.5, -192) -- PRESISI TENGAH KHUSUS HP 64-BIT
     keyGui.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
     keyGui.BackgroundTransparency = 0
     keyGui.BorderSizePixel = 0
