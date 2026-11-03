@@ -573,6 +573,33 @@ task.spawn(function()
     end
 end)
 
+-- GENERATE Hwid UNTUK DITAMPILKAN DIBAWAH PROFIL MAP
+local function generateHwid()
+    local chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+    local function part(n)
+        local s = ""
+        for i = 1, n do
+            local rand = math.random(1, #chars)
+            s = s .. string.sub(chars, rand, rand)
+        end
+        return s
+    end
+    return part(4) .. "-" .. part(4) .. "-" .. part(4)
+end
+
+local generatedHwidString = generateHwid()
+
+local hwidLabel = Instance.new("TextLabel", profileFrame)
+hwidLabel.Size = UDim2.new(0, 96, 0, 15)
+hwidLabel.Position = UDim2.new(0, 2, 0, 68)
+hwidLabel.BackgroundTransparency = 1
+hwidLabel.TextTransparency = 0
+hwidLabel.Text = "HWID: " .. generatedHwidString
+hwidLabel.TextColor3 = Color3.fromRGB(0, 255, 128)
+hwidLabel.Font = Enum.Font.Code
+hwidLabel.TextSize = 8
+hwidLabel.TextXAlignment = Enum.TextXAlignment.Left
+
 local pages = Instance.new("Frame", main); pages.Size = UDim2.new(1, -115, 1, -50); pages.Position = UDim2.new(0, 110, 0, 45); pages.BackgroundTransparency = 1
 
 local function createPage(name)
@@ -1736,57 +1763,198 @@ else
 
     local keyGui = Instance.new("Frame")
     keyGui.Name = "KeyGui"
-    keyGui.Size = UDim2.new(0, 360, 0, 385)
-    keyGui.Position = UDim2.new(0.5, -180, 0.5, -192) -- PRESISI TENGAH KHUSUS HP 64-BIT
-    keyGui.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    keyGui.Size = UDim2.new(0, 510, 0, 300)
+    keyGui.Position = UDim2.new(0.5, -255, 0.5, -150) -- POSISI DISAMAKAN PERSIS SEPERTI GUI UTAMA
+    keyGui.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
     keyGui.BackgroundTransparency = 0
     keyGui.BorderSizePixel = 0
     keyGui.Active = true
+    keyGui.Draggable = true
     Instance.new("UICorner", keyGui)
     applyBlackGreyGradient(keyGui)
     local keyStroke = Instance.new("UIStroke", keyGui)
-    keyStroke.Thickness = 2
-    keyStroke.Color = Color3.fromRGB(255, 255, 255)
+    keyStroke.Thickness = 2.5
     keyGui.Parent = screenGui
 
+    -- Efek Rainbow Pinggir Frame Key System
+    rs.RenderStepped:Connect(function()
+        if keyGui and keyGui.Parent then
+            local hue = (tick() * 0.15) % 1
+            keyStroke.Color = Color3.fromHSV(hue, 0.8, 1)
+        end
+    end)
+
+    -- 3 Bulatan Kecil Di Pojok Kiri Atas Key System
+    local keyTopDotsContainer = Instance.new("Frame", keyGui)
+    keyTopDotsContainer.Size = UDim2.new(0, 50, 0, 15)
+    keyTopDotsContainer.Position = UDim2.new(0, 8, 0, 8)
+    keyTopDotsContainer.BackgroundTransparency = 1
+
+    local kDotRed = Instance.new("Frame", keyTopDotsContainer)
+    kDotRed.Size = UDim2.new(0, 10, 0, 10)
+    kDotRed.Position = UDim2.new(0, 0, 0.5, -5)
+    kDotRed.BackgroundColor3 = Color3.fromRGB(255, 95, 86)
+    kDotRed.BorderSizePixel = 0
+    Instance.new("UICorner", kDotRed).CornerRadius = UDim.new(1, 0)
+
+    local kDotYellow = Instance.new("Frame", keyTopDotsContainer)
+    kDotYellow.Size = UDim2.new(0, 10, 0, 10)
+    kDotYellow.Position = UDim2.new(0, 14, 0.5, -5)
+    kDotYellow.BackgroundColor3 = Color3.fromRGB(255, 189, 46)
+    kDotYellow.BorderSizePixel = 0
+    Instance.new("UICorner", kDotYellow).CornerRadius = UDim.new(1, 0)
+
+    local kDotGreen = Instance.new("Frame", keyTopDotsContainer)
+    kDotGreen.Size = UDim2.new(0, 10, 0, 10)
+    kDotGreen.Position = UDim2.new(0, 28, 0.5, -5)
+    kDotGreen.BackgroundColor3 = Color3.fromRGB(39, 201, 63)
+    kDotGreen.BorderSizePixel = 0
+    Instance.new("UICorner", kDotGreen).CornerRadius = UDim.new(1, 0)
+
     local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(1, 0, 0, 40)
-    titleLabel.Position = UDim2.new(0, 0, 0, 10)
-    titleLabel.Text = "Meknoyu GUI"
+    titleLabel.Size = UDim2.new(1, -120, 0, 25)
+    titleLabel.Position = UDim2.new(0, 65, 0, 5)
+    titleLabel.Text = "MEKNOYU GUI | KEY SYSTEM"
     titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.TextSize = 22
+    titleLabel.TextSize = 14
     titleLabel.TextTransparency = 0
     titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     titleLabel.BackgroundTransparency = 1
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = keyGui
 
     local subTitleLabel = Instance.new("TextLabel")
-    subTitleLabel.Size = UDim2.new(1, 0, 0, 25)
-    subTitleLabel.Position = UDim2.new(0, 0, 0, 45)
-    subTitleLabel.Text = "Get Key\n(Expired in 23h 59m)"
+    subTitleLabel.Size = UDim2.new(1, -120, 0, 15)
+    subTitleLabel.Position = UDim2.new(0, 65, 0, 26)
+    subTitleLabel.Text = "Get Key (Expired in 23h 59m)"
     subTitleLabel.Font = Enum.Font.GothamMedium
-    subTitleLabel.TextSize = 12
+    subTitleLabel.TextSize = 11
     subTitleLabel.TextTransparency = 0
-    subTitleLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    subTitleLabel.TextColor3 = Color3.fromRGB(0, 255, 128)
     subTitleLabel.BackgroundTransparency = 1
+    subTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     subTitleLabel.Parent = keyGui
 
+    -- PROFIL & MAP DI POJOK KIRI BAWAH KEY SYSTEM
+    local keyProfileFrame = Instance.new("Frame", keyGui)
+    keyProfileFrame.Size = UDim2.new(0, 100, 0, 95)
+    keyProfileFrame.Position = UDim2.new(0, 5, 1, -98)
+    keyProfileFrame.BackgroundTransparency = 1
+
+    local keyProfilePic = Instance.new("ImageLabel", keyProfileFrame)
+    keyProfilePic.Size = UDim2.new(0, 32, 0, 32)
+    keyProfilePic.Position = UDim2.new(0, 2, 0, 2)
+    keyProfilePic.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+    keyProfilePic.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. plr.UserId .. "&width=150&height=150&format=png"
+    Instance.new("UICorner", keyProfilePic).CornerRadius = UDim.new(1, 0)
+
+    local keyProfileStroke = Instance.new("UIStroke", keyProfilePic)
+    keyProfileStroke.Thickness = 1.5
+    rs.RenderStepped:Connect(function()
+        if keyProfileStroke and keyProfileStroke.Parent then
+            keyProfileStroke.Color = Color3.fromHSV((tick() * 0.3) % 1, 0.8, 1)
+        end
+    end)
+
+    local keyDisplayNameLabel = Instance.new("TextLabel", keyProfileFrame)
+    keyDisplayNameLabel.Size = UDim2.new(0, 60, 0, 12)
+    keyDisplayNameLabel.Position = UDim2.new(0, 38, 0, 2)
+    keyDisplayNameLabel.BackgroundTransparency = 1
+    keyDisplayNameLabel.TextTransparency = 0
+    keyDisplayNameLabel.Text = "Name: " .. plr.DisplayName
+    keyDisplayNameLabel.TextColor3 = Color3.fromRGB(180, 80, 255)
+    keyDisplayNameLabel.Font = Enum.Font.GothamBold
+    keyDisplayNameLabel.TextSize = 8
+    keyDisplayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local keyUseridLabel = Instance.new("TextLabel", keyProfileFrame)
+    keyUseridLabel.Size = UDim2.new(0, 60, 0, 12)
+    keyUseridLabel.Position = UDim2.new(0, 38, 0, 14)
+    keyUseridLabel.BackgroundTransparency = 1
+    keyUseridLabel.TextTransparency = 0
+    keyUseridLabel.Text = "UserID: " .. plr.UserId
+    keyUseridLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+    keyUseridLabel.Font = Enum.Font.GothamMedium
+    keyUseridLabel.TextSize = 7
+    keyUseridLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local keyMapIcon = Instance.new("ImageLabel", keyProfileFrame)
+    keyMapIcon.Size = UDim2.new(0, 22, 0, 22)
+    keyMapIcon.Position = UDim2.new(0, 2, 0, 38)
+    keyMapIcon.BackgroundColor3 = Color3.fromRGB(55, 55, 65)
+    Instance.new("UICorner", keyMapIcon).CornerRadius = UDim.new(0, 4)
+
+    local keyMapNameLabel = Instance.new("TextLabel", keyProfileFrame)
+    keyMapNameLabel.Size = UDim2.new(0, 72, 0, 25)
+    keyMapNameLabel.Position = UDim2.new(0, 28, 0, 36)
+    keyMapNameLabel.BackgroundTransparency = 1
+    keyMapNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    keyMapNameLabel.Font = Enum.Font.GothamBold
+    keyMapNameLabel.TextSize = 8
+    keyMapNameLabel.TextWrapped = true
+    keyMapNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    task.spawn(function()
+        local success, info = pcall(function()
+            return mps:GetProductInfo(game.PlaceId)
+        end)
+        if success and info then
+            keyMapNameLabel.Text = "Name Map:\n" .. info.Name
+            if info.IconImageAssetId and info.IconImageAssetId > 0 then
+                keyMapIcon.Image = "rbxassetid://" .. tostring(info.IconImageAssetId)
+            else
+                keyMapIcon.Image = "rbxassetid://6023426915"
+            end
+        else
+            keyMapNameLabel.Text = "Name Map:\n" .. game.Name
+            keyMapIcon.Image = "rbxassetid://6023426915"
+        end
+    end)
+
+    -- GENERATE HWID DIBAWAH PROFIL MAP KEY SYSTEM (FORMAT xxxx-xxxx-xxxx)
+    local function generateRealHwid()
+        local chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+        local function p4()
+            local s = ""
+            for i = 1, 4 do
+                local r = math.random(1, #chars)
+                s = s .. string.sub(chars, r, r)
+            end
+            return s
+        end
+        return p4() .. "-" .. p4() .. "-" .. p4()
+    end
+
+    local userHwidString = generateRealHwid()
+
+    local keyHwidLabel = Instance.new("TextLabel", keyProfileFrame)
+    keyHwidLabel.Size = UDim2.new(0, 96, 0, 15)
+    keyHwidLabel.Position = UDim2.new(0, 2, 0, 68)
+    keyHwidLabel.BackgroundTransparency = 1
+    keyHwidLabel.TextTransparency = 0
+    keyHwidLabel.Text = "HWID: " .. userHwidString
+    keyHwidLabel.TextColor3 = Color3.fromRGB(0, 255, 128)
+    keyHwidLabel.Font = Enum.Font.Code
+    keyHwidLabel.TextSize = 8
+    keyHwidLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- KOTAK UTAMA INPUT KEY DI TENGAH
     local keyTextBox = Instance.new("TextBox")
-    keyTextBox.Size = UDim2.new(0.85, 0, 0, 35)
-    keyTextBox.Position = UDim2.new(0.075, 0, 0, 90)
+    keyTextBox.Size = UDim2.new(0, 280, 0, 35)
+    keyTextBox.Position = UDim2.new(0.5, -140, 0, 85)
     keyTextBox.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
     keyTextBox.Text = ""
-    keyTextBox.PlaceholderText = "Example_Key"
+    keyTextBox.PlaceholderText = "Masukkan key (contoh: xxxx-xxxx-xxxx)..."
     keyTextBox.TextTransparency = 0
     keyTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     keyTextBox.Font = Enum.Font.Gotham
-    keyTextBox.TextSize = 14
+    keyTextBox.TextSize = 12
     Instance.new("UICorner", keyTextBox)
     keyTextBox.Parent = keyGui
 
     local getKeyBtn = Instance.new("TextButton")
-    getKeyBtn.Size = UDim2.new(0.4, 0, 0, 35)
-    getKeyBtn.Position = UDim2.new(0.075, 0, 0, 140)
+    getKeyBtn.Size = UDim2.new(0, 135, 0, 35)
+    getKeyBtn.Position = UDim2.new(0.5, -140, 0, 135)
     getKeyBtn.Text = "Get Key"
     getKeyBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
     getKeyBtn.BackgroundTransparency = 0
@@ -1795,14 +1963,14 @@ else
     getKeyBtn.TextStrokeTransparency = 0.5
     getKeyBtn.TextStrokeColor3 = Color3.new(0, 0, 0)
     getKeyBtn.Font = Enum.Font.GothamBold
-    getKeyBtn.TextSize = 14
+    getKeyBtn.TextSize = 13
     Instance.new("UICorner", getKeyBtn)
     applyBlackGreyGradient(getKeyBtn)
     getKeyBtn.Parent = keyGui
 
     local confirmBtn = Instance.new("TextButton")
-    confirmBtn.Size = UDim2.new(0.4, 0, 0, 35)
-    confirmBtn.Position = UDim2.new(0.525, 0, 0, 140)
+    confirmBtn.Size = UDim2.new(0, 135, 0, 35)
+    confirmBtn.Position = UDim2.new(0.5, 5, 0, 135)
     confirmBtn.Text = "Confirm"
     confirmBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
     confirmBtn.BackgroundTransparency = 0
@@ -1811,32 +1979,31 @@ else
     confirmBtn.TextStrokeTransparency = 0.5
     confirmBtn.TextStrokeColor3 = Color3.new(0, 0, 0)
     confirmBtn.Font = Enum.Font.GothamBold
-    confirmBtn.TextSize = 14
+    confirmBtn.TextSize = 13
     Instance.new("UICorner", confirmBtn)
     applyBlackGreyGradient(confirmBtn)
     confirmBtn.Parent = keyGui
 
     local questFrame = Instance.new("Frame")
-    questFrame.Size = UDim2.new(0, 340, 0, 190)
-    questFrame.Position = UDim2.new(0.025, 0, 0, 185)
+    questFrame.Size = UDim2.new(0, 320, 0, 160)
+    questFrame.Position = UDim2.new(0.5, -160, 0, 80)
     questFrame.BackgroundTransparency = 1
     questFrame.Visible = false
     questFrame.Parent = keyGui
 
     local quests = {
-        {text = "LIKE SCRIPT THIS FOR FREE!", cd = 10},
-        {text = "MEKNOYU OFFICIAL SCRIPT OP!", cd = 20},
-        {text = "GET KEY FOR FREE YOUR!", cd = 30},
-        {text = "SCRIPT UPDATE NEW FEATURES!", cd = 50}
+        {text = "LIKE SCRIPT THIS FOR FREE!", cd = 5},
+        {text = "MEKNOYU OFFICIAL SCRIPT OP!", cd = 10},
+        {text = "GET KEY FOR FREE YOUR!", cd = 15},
+        {text = "SCRIPT UPDATE NEW FEATURES!", cd = 20}
     }
 
-    local questButtons = {}
     local questStatus = {false, false, false, false}
 
     for i, q in ipairs(quests) do
         local qBtn = Instance.new("TextButton")
-        qBtn.Size = UDim2.new(0.65, 0, 0, 35)
-        qBtn.Position = UDim2.new(0, 0, 0, (i-1) * 45)
+        qBtn.Size = UDim2.new(0.7, 0, 0, 32)
+        qBtn.Position = UDim2.new(0, 0, 0, (i-1) * 38)
         qBtn.Text = q.text
         qBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
         qBtn.BackgroundTransparency = 0
@@ -1852,14 +2019,14 @@ else
         qBtn.Parent = questFrame
         
         local cdLabel = Instance.new("TextLabel")
-        cdLabel.Size = UDim2.new(0.3, 0, 0, 35)
-        cdLabel.Position = UDim2.new(0.7, 0, 0, (i-1) * 45)
+        cdLabel.Size = UDim2.new(0.26, 0, 0, 32)
+        cdLabel.Position = UDim2.new(0.74, 0, 0, (i-1) * 38)
         cdLabel.Text = q.cd .. " s"
         cdLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
         cdLabel.TextTransparency = 0
         cdLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         cdLabel.Font = Enum.Font.GothamBold
-        cdLabel.TextSize = 12
+        cdLabel.TextSize = 11
         Instance.new("UICorner", cdLabel)
         cdLabel.Parent = questFrame
 
@@ -1900,19 +2067,20 @@ else
     copyKeyGui.Parent = keyGui
 
     local copyTitle = Instance.new("TextLabel")
-    copyTitle.Size = UDim2.new(1, 0, 0, 40)
-    copyTitle.Position = UDim2.new(0, 0, 0, 40)
+    copyTitle.Size = UDim2.new(1, -120, 0, 30)
+    copyTitle.Position = UDim2.new(0, 65, 0, 40)
     copyTitle.Text = "Copy Your Key"
     copyTitle.Font = Enum.Font.GothamBold
-    copyTitle.TextSize = 20
+    copyTitle.TextSize = 16
     copyTitle.TextTransparency = 0
     copyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
     copyTitle.BackgroundTransparency = 1
+    copyTitle.TextXAlignment = Enum.TextXAlignment.Left
     copyTitle.Parent = copyKeyGui
 
     local keyDisplayBox = Instance.new("TextBox")
-    keyDisplayBox.Size = UDim2.new(0.85, 0, 0, 35)
-    keyDisplayBox.Position = UDim2.new(0.075, 0, 0, 100)
+    keyDisplayBox.Size = UDim2.new(0, 280, 0, 35)
+    keyDisplayBox.Position = UDim2.new(0.5, -140, 0, 95)
     keyDisplayBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     keyDisplayBox.TextTransparency = 0
     keyDisplayBox.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -1924,8 +2092,8 @@ else
     keyDisplayBox.Parent = copyKeyGui
 
     local copyActionBtn = Instance.new("TextButton")
-    copyActionBtn.Size = UDim2.new(0.5, 0, 0, 35)
-    copyActionBtn.Position = UDim2.new(0.25, 0, 0, 160)
+    copyActionBtn.Size = UDim2.new(0, 200, 0, 35)
+    copyActionBtn.Position = UDim2.new(0.5, -100, 0, 145)
     copyActionBtn.Text = "Click to Copy Key"
     copyActionBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
     copyActionBtn.BackgroundTransparency = 0
@@ -1934,7 +2102,7 @@ else
     copyActionBtn.TextStrokeTransparency = 0.5
     copyActionBtn.TextStrokeColor3 = Color3.new(0, 0, 0)
     copyActionBtn.Font = Enum.Font.GothamBold
-    copyActionBtn.TextSize = 13
+    copyActionBtn.TextSize = 12
     Instance.new("UICorner", copyActionBtn)
     applyBlackGreyGradient(copyActionBtn)
     copyActionBtn.Parent = copyKeyGui
@@ -1950,16 +2118,16 @@ else
 
     local closeCopyBtn = Instance.new("TextButton")
     closeCopyBtn.Size = UDim2.new(0, 30, 0, 30)
-    closeCopyBtn.Position = UDim2.new(1, -35, 0, 5)
+    closeCopyBtn.Position = UDim2.new(1, -35, 0, 7)
     closeCopyBtn.Text = "X"
     closeCopyBtn.TextTransparency = 0
-    closeCopyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeCopyBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
     closeCopyBtn.TextStrokeTransparency = 0.5
     closeCopyBtn.TextStrokeColor3 = Color3.new(0, 0, 0)
-    closeCopyBtn.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
+    closeCopyBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 65)
     closeCopyBtn.BackgroundTransparency = 0
     closeCopyBtn.Font = Enum.Font.GothamBold
-    closeCopyBtn.TextSize = 14
+    closeCopyBtn.TextSize = 12
     Instance.new("UICorner", closeCopyBtn)
     applyBlackGreyGradient(closeCopyBtn)
     closeCopyBtn.Parent = copyKeyGui
@@ -1980,13 +2148,16 @@ else
         getKeyBtn.Visible = false
         confirmBtn.Visible = false
         
-        local chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        local randomString = ""
-        for i = 1, 8 do
-            local rand = math.random(1, #chars)
-            randomString = randomString .. string.sub(chars, rand, rand)
+        local function p4()
+            local chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+            local s = ""
+            for i = 1, 4 do
+                local r = math.random(1, #chars)
+                s = s .. string.sub(chars, r, r)
+            end
+            return s
         end
-        currentGeneratedKey = "Mekno_" .. randomString
+        currentGeneratedKey = p4() .. "-" .. p4() .. "-" .. p4()
         keyDisplayBox.Text = currentGeneratedKey
         
         copyKeyGui.Visible = true
