@@ -1077,7 +1077,7 @@ local function updateFriendDropdown()
                 Instance.new("UICorner", fBtn).CornerRadius = UDim.new(0, 4)
                 fBtn.MouseButton1Click:Connect(function()
                     selectedFriendName = p.Name
-                    dropFriendText.Text = "  Teleport to Friends: " .. p.Name
+                    dropFriendText.Text = "  Teleport to Friends: " + p.Name
                     listFriendScroll.Visible = false
                     dropFriendArrow.Text = "V"
                 end)
@@ -1112,7 +1112,65 @@ infoText.TextXAlignment = Enum.TextXAlignment.Left; infoText.TextYAlignment = En
 infoText.Text = "This script is strictly guarded and secure. There is no account theft or fraud. This script is securely protected, and no malicious bots will steal your data.\n\nCreated by Progaming Meknoyu Script.\n\nAll Engine Core modules, anti-detection filters, and local virtualization protocols are managed natively. Optimization systems are running automatically in the background to ensure stable FPS."
 
 -- // TAB GAMES CONTENT //
-local function createGameBtn(name, parent, func)
+local function createGameBtn(name, targetPlaceId, url, parent)
+    local b = Instance.new("TextButton", parent)
+    b.Text = name
+    b.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
+    b.BackgroundTransparency = 0
+    b.TextTransparency = 0
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.TextStrokeTransparency = 0.5
+    b.TextStrokeColor3 = Color3.new(0,0,0)
+    b.Font = Enum.Font.GothamBold
+    b.TextSize = 10
+    Instance.new("UICorner", b)
+    applyBlackGreyGradient(b)
+    
+    b.MouseButton1Click:Connect(function()
+        b.Text = "Loading..."
+        task.wait(1.5)
+        if game.PlaceId == targetPlaceId then
+            customNotify("Success", "Game verified successfully!", 3)
+            b.Text = name
+            pcall(function()
+                loadstring(game:HttpGet(url))()
+            end)
+        else
+            customNotify("Error", "You are not in the same game", 4)
+            b.Text = name
+        end
+    end)
+    return b
+end
+
+createGameBtn("Murder Mystery 2 Script", 142823291, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/mm2.lua", pageGames)
+
+createGameBtn("Survive the Killer Script", 2577684618, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/SurvivetheKiller.lua", pageGames)
+
+createGameBtn("Slime RNG Script", 10141151624, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Slimerng.lua", pageGames)
+
+createGameBtn("Quiet or Die Script", 8171175440, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/QuietorDie.lua", pageGames)
+
+createGameBtn("Chicken Farm Script", 11210864111, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Chickenfarm.lua", pageGames)
+
+createGameBtn("Mine Per Click Script", 11210864111, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Mineperclick.lua", pageGames)
+
+createGameBtn("Pass or Explode Script", 11210864111, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/PassorExplode.lua", pageGames)
+
+createGameBtn("Prison Life Script", 155615604, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Prisonlife.lua", pageGames)
+
+createGameBtn("Natural Disaster Survival Script", 189707, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Naturaldisastersurvival.lua", pageGames)
+
+createGameBtn("Sell Lemons Script", 11210864111, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Sell_lemons.lua", pageGames)
+
+createGameBtn("Paint and Seek Script", 11210864111, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Paintandseek.lua", pageGames)
+
+createGameBtn("Grow a Garden 2 Script", 11210864111, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/gag2.lua", pageGames)
+
+createGameBtn("Pistol Arena Script", 11210864111, "https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/PistolArena.lua", pageGames)
+
+-- // TAB SERVER CONTENT //
+local function createServerBtn(name, parent, func)
     local b = Instance.new("TextButton", parent)
     b.Text = name
     b.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
@@ -1129,64 +1187,11 @@ local function createGameBtn(name, parent, func)
     return b
 end
 
-createGameBtn("Murder Mystery 2 Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/mm2.lua"))()
-end)
-
-createGameBtn("Survive the Killer Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/SurvivetheKiller.lua"))()
-end)
-
-createGameBtn("Slime RNG Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Slimerng.lua"))()
-end)
-
-createGameBtn("Quiet or Die Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/QuietorDie.lua"))()
-end)
-
-createGameBtn("Chicken Farm Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Chickenfarm.lua"))()
-end)
-
-createGameBtn("Mine Per Click Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Mineperclick.lua"))()
-end)
-
-createGameBtn("Pass or Explode Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/PassorExplode.lua"))()
-end)
-
-createGameBtn("Prison Life Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Prisonlife.lua"))()
-end)
-
-createGameBtn("Natural Disaster Survival Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Naturaldisastersurvival.lua"))()
-end)
-
-createGameBtn("Sell Lemons Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Sell_lemons.lua"))()
-end)
-
-createGameBtn("Paint and Seek Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/Paintandseek.lua"))()
-end)
-
-createGameBtn("Grow a Garden 2 Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/gag2.lua"))()
-end)
-
-createGameBtn("Pistol Arena Script", pageGames, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MeknoyuReals/Meknoyu/refs/heads/main/PistolArena.lua"))()
-end)
-
--- // TAB SERVER CONTENT //
-createGameBtn("Rejoin", pageServer, function()
+createServerBtn("Rejoin", pageServer, function()
     game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, plr)
 end)
 
-createGameBtn("Small Server", pageServer, function()
+createServerBtn("Small Server", pageServer, function()
     local ts = game:GetService("TeleportService")
     local http = game:GetService("HttpService")
     local api = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
@@ -1204,7 +1209,7 @@ createGameBtn("Small Server", pageServer, function()
     end)
 end)
 
-createGameBtn("Server Hop", pageServer, function()
+createServerBtn("Server Hop", pageServer, function()
     local ts = game:GetService("TeleportService")
     local http = game:GetService("HttpService")
     local api = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
@@ -1225,7 +1230,7 @@ createGameBtn("Server Hop", pageServer, function()
     end)
 end)
 
-createGameBtn("Server New", pageServer, function()
+createServerBtn("Server New", pageServer, function()
     local ts = game:GetService("TeleportService")
     local http = game:GetService("HttpService")
     local api = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
@@ -1664,7 +1669,44 @@ rs.RenderStepped:Connect(function()
     if states.tpKill then local targetEnemy = nil; local shortestDist = math.huge; for _, p in pairs(players:GetPlayers()) do if p ~= plr and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0 then local tChar = p.Character; local inLobby = tChar.Parent.Name:lower():find("lobby") or tChar:FindFirstChild("InLobby") or (tChar.HumanoidRootPart.Position.Y > 200 and workspace:FindFirstChild("Lobby")); if not inLobby and (not plr.Team or p.Team ~= plr.Team) then local targetHrp = p.Character.HumanoidRootPart; local currentDist = (targetHrp.Position - hrp.Position).Magnitude; if currentDist < shortestDist then targetEnemy = targetHrp; shortestDist = currentDist end end end end; if targetEnemy then hrp.CFrame = targetEnemy.CFrame * CFrame.new(0, 0, 3); hrp.Velocity = Vector3.new(0, 0, 0); cam.CFrame = CFrame.new(cam.CFrame.Position, targetEnemy.Position) end end
     if states.disco then local hue = (tick() * 0.3) % 1; local rainbowColor = Color3.fromHSV(hue, 0.8, 1); lighting.Ambient = rainbowColor; lighting.OutdoorAmbient = rainbowColor; lighting.FogColor = rainbowColor; skyText.TextColor3 = Color3.fromHSV((tick() * 1.5) % 1, 1, 1) end
     if states.hcxxr then lighting.Ambient = Color3.fromRGB(255, 0, 0); lighting.OutdoorAmbient = Color3.fromRGB(150, 0, 0); for _, p in pairs(players:GetPlayers()) do if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then local root = p.Character.HumanoidRootPart; if not root:FindFirstChild("MeknoFire") then local f = Instance.new("Fire", root); f.Name = "MeknoFire"; f.Heat = 25; f.Size = 15; f.Color = Color3.fromRGB(255, 0, 0); f.SecondaryColor = Color3.fromRGB(100, 0, 0) end; for _, part in pairs(p.Character:GetDescendants()) do if part:IsA("BasePart") or part:IsA("Decal") then if part.Name == "HumanoidRootPart" then continue end; part.Transparency = 0 end end end end end
-    if states.aimActive and not states.tpKill then local target = nil; local shortDistance = math.huge; for _, p in pairs(players:GetPlayers()) do if p ~= plr and p.Character and p.Character:FindFirstChild("Head") and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0 then if not plr.Team or p.Team ~= plr.Team or plr.Team == nil then local head = p.Character.Head; local currentDist = (head.Position - hrp.Position).Magnitude; if currentDist < shortDistance then target = head; shortDistance = currentDist end end end end; if target then cam.CFrame = CFrame.lookAt(cam.CFrame.Position, target.Position); local currentTool = char:FindFirstChildOfClass("Tool"); if currentTool then currentTool:Activate() end end end
+    
+    -- Helper WallCheck Function
+    local function isVisible(targetPart)
+        if not targetPart or not hrp then return false end
+        local raycastParams = RaycastParams.new()
+        raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+        raycastParams.FilterDescendantsInstances = {char, targetPart.Parent}
+        raycastParams.IgnoreWater = true
+        
+        local origin = cam.CFrame.Position
+        local direction = targetPart.Position - origin
+        local result = workspace:Raycast(origin, direction, raycastParams)
+        return result == nil
+    end
+
+    -- AIMBOT (DENGAN WALLCHECK DAN TARGET LOCK YANG PRESISI)
+    if states.aimActive and not states.tpKill then
+        local target = nil
+        local shortDistance = math.huge
+        for _, p in pairs(players:GetPlayers()) do
+            if p ~= plr and p.Character and p.Character:FindFirstChild("Head") and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0 then
+                if not plr.Team or p.Team ~= plr.Team or plr.Team == nil then
+                    local head = p.Character.Head
+                    if isVisible(head) then
+                        local currentDist = (head.Position - hrp.Position).Magnitude
+                        if currentDist < shortDistance then
+                            target = head
+                            shortDistance = currentDist
+                        end
+                    end
+                end
+            end
+        end
+        if target then
+            cam.CFrame = CFrame.lookAt(cam.CFrame.Position, target.Position)
+        end
+    end
+
     if states.esp then for _, p in pairs(players:GetPlayers()) do if p ~= plr and p.Character and not p.Character:FindFirstChild("MeknoHighlight") then Instance.new("Highlight", p.Character).Name = "MeknoHighlight" end end end
     
     if states.tracer then
@@ -1706,18 +1748,18 @@ rs.RenderStepped:Connect(function()
     if states.speed and hum.MoveDirection.Magnitude > 0 then hrp.CFrame = hrp.CFrame + (hum.MoveDirection * 1.5) end
 end)
 
--- ==========================================================
+-- ==========================================
 --    SISTEM DETEKSI DEVICE (NOTIFIKASI MOBILE / BULAT)
--- ==========================================================
+-- ==========================================
 task.defer(function()
     customNotify("Device Mobile", "Mobile UI Optimized", 5)
 end)
 
 end
 
--- ==========================================================
+-- ==========================================
 --    LOGIKA BYPASS OWNER & INITIALIZATION KEY SYSTEM
--- ==========================================================
+-- ==========================================
 if plr.Name == "Meknoyu" then
     mainEngineLoad()
 else
@@ -2133,7 +2175,7 @@ else
     closeCopyBtn.Parent = copyKeyGui
 
     closeCopyBtn.MouseButton1Click:Connect(function()
-        copyKeyGui.Visible = false
+        copyKeyGui.Visible = true
         titleLabel.Visible = true
         subTitleLabel.Visible = true
         keyTextBox.Visible = true
